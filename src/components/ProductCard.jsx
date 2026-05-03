@@ -25,7 +25,7 @@ export default function ProductCard({ product }) {
             src={imgError
               ? 'https://placehold.co/400x400/E8F0E0/2D5016?text=Tram+Huong'
               : product.image_url
-                ? `http://localhost:3000${product.image_url}`
+                ? `http://https://tramhuong-backend.onrender.com${product.image_url}`
                 : `https://picsum.photos/seed/tram${product.id_product}/400/400`
             }
             alt={product.product_name}

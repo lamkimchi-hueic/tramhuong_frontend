@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { productAPI, categoryAPI } from '../../services/api';
 import { FiEdit2, FiTrash2, FiPlus, FiX, FiImage, FiUpload, FiRotateCcw, FiArrowLeft, FiMinus } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://https://tramhuong-backend.onrender.com';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);

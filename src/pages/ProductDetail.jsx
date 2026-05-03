@@ -79,7 +79,7 @@ export default function ProductDetail() {
             <div className="rounded-2xl overflow-hidden bg-[var(--color-cream)]">
               <img
                 src={product.image_url
-                  ? `http://localhost:3000${product.image_url}`
+                  ? `http://https://tramhuong-backend.onrender.com${product.image_url}`
                   : `https://picsum.photos/seed/tram${product.id_product}/600/600`
                 }
                 alt={product.product_name}
