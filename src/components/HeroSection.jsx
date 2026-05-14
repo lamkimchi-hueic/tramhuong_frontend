@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import heroBanner from '../assets/images/hero_banner.png';
+
+// Ảnh nền: trầm hương/zen sáng tươi (Unsplash) - thay URL nên nếu muốn
+const heroBanner = 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1920&q=80';
 
 export default function HeroSection() {
   const [loaded, setLoaded] = useState(false);
@@ -20,8 +22,8 @@ export default function HeroSection() {
         />
       </div>
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-br from-[rgba(30,58,14,0.82)] via-[rgba(45,80,22,0.65)] to-[rgba(0,0,0,0.3)]" />
+      {/* Gradient Overlay - warm/light cho tươi sáng */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-[rgba(255,250,240,0.92)] via-[rgba(250,235,215,0.75)] to-[rgba(180,140,90,0.25)]" />
 
       {/* Content */}
       <div
@@ -29,17 +31,17 @@ export default function HeroSection() {
           loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
-        <span className="inline-block px-4 py-1.5 bg-[var(--color-gold)]/20 border border-[var(--color-gold)]/50 rounded-full text-[var(--color-gold-light)] text-xs font-semibold tracking-[2px] uppercase mb-5">
+        <span className="inline-block px-4 py-1.5 bg-[var(--color-gold)]/15 border border-[var(--color-gold)]/40 rounded-full text-[var(--color-gold-dark)] text-xs font-semibold tracking-[2px] uppercase mb-5">
           ✦ Tinh Hoa Trầm Hương Việt
         </span>
 
-        <h1 className="font-[family-name:var(--font-heading)] text-4xl md:text-5xl lg:text-[3.2rem] font-bold text-white leading-tight mb-5">
+        <h1 className="font-[family-name:var(--font-heading)] text-4xl md:text-5xl lg:text-[3.2rem] font-bold text-[var(--color-primary)] leading-tight mb-5">
           Khám Phá Vẻ Đẹp<br />
           Tinh Khôi Và Sang Trọng Của<br />
-          <span className="text-[var(--color-gold-light)]">Trầm Hương Tâm An</span>
+          <span className="text-[var(--color-gold-dark)]">Trầm Hương Tâm An</span>
         </h1>
 
-        <p className="text-base md:text-lg text-white/85 leading-relaxed mb-8 max-w-md">
+        <p className="text-base md:text-lg text-gray-700 leading-relaxed mb-8 max-w-md">
           Mang đến những sản phẩm trầm hương thiên nhiên cao cấp nhất,
           được chế tác tỉ mỉ từ bàn tay nghệ nhân lành nghề.
         </p>
@@ -55,7 +57,7 @@ export default function HeroSection() {
           <Link
             to="/about"
             id="hero-about"
-            className="inline-flex items-center justify-center px-8 py-3.5 border-2 border-white text-white font-semibold text-sm uppercase tracking-wide rounded-md hover:bg-white hover:text-[var(--color-primary)] hover:-translate-y-0.5 transition-all duration-300"
+            className="inline-flex items-center justify-center px-8 py-3.5 border-2 border-[var(--color-primary)] text-[var(--color-primary)] font-semibold text-sm uppercase tracking-wide rounded-md hover:bg-[var(--color-primary)] hover:text-white hover:-translate-y-0.5 transition-all duration-300"
           >
             Tìm Hiểu Thêm
           </Link>
@@ -63,9 +65,9 @@ export default function HeroSection() {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center gap-2 text-white/60 text-xs tracking-wider animate-float">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center gap-2 text-[var(--color-primary)]/60 text-xs tracking-wider animate-float">
         <span>CUỘN XUỐNG</span>
-        <div className="w-px h-8 bg-gradient-to-b from-white/60 to-transparent" />
+        <div className="w-px h-8 bg-gradient-to-b from-[var(--color-primary)]/60 to-transparent" />
       </div>
     </section>
   );
