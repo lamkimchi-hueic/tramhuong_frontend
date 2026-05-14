@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
 
 // Ảnh sản phẩm: trầm hương / agarwood
-const productImage = 'https://images.unsplash.com/photo-1602810316693-3667c854239a?auto=format&fit=crop&w=1200&q=85';
+const productImage = 'https://images.unsplash.com/photo-1697446631489-3e4fbbcf6065?q=80&w=1170&auto=format&fit=crop';
 const altImage = 'https://images.unsplash.com/photo-1545048702-79362596cdc9?auto=format&fit=crop&w=1200&q=85';
 
 export default function HeroSection() {
