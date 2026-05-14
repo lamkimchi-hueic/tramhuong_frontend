@@ -16,13 +16,13 @@ export default function HeroSection() {
   return (
     <section
       id="hero-section"
-      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-[#faf6ed] via-[#f5ede0] to-[#ebdfc8]"
+      className="relative h-screen min-h-[600px] max-h-[900px] flex items-center overflow-hidden bg-gradient-to-br from-[#faf6ed] via-[#f5ede0] to-[#ebdfc8] pt-20"
     >
       {/* Decorative blobs */}
       <div className="absolute top-20 -left-20 w-80 h-80 bg-[var(--color-gold)]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-20 right-1/3 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative z-[2] max-w-7xl mx-auto w-full px-6 md:px-12 lg:px-16 py-20 grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-[2] max-w-7xl mx-auto w-full px-6 md:px-12 lg:px-16 py-8 md:py-12 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         {/* LEFT: Text content */}
         <div
           className={`transition-all duration-1000 ${
@@ -34,7 +34,7 @@ export default function HeroSection() {
             Tinh Hoa Trầm Hương Việt
           </span>
 
-          <h1 className="font-[family-name:var(--font-heading)] text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--color-primary)] leading-[1.1] mb-6">
+          <h1 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-[var(--color-primary)] leading-[1.1] mb-5">
             Khám Phá Vẻ Đẹp<br />
             Tinh Khôi Của<br />
             <span className="relative inline-block">
@@ -43,12 +43,12 @@ export default function HeroSection() {
             </span>
           </h1>
 
-          <p className="text-base md:text-lg text-gray-600 leading-relaxed mb-8 max-w-lg">
+          <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-6 max-w-lg">
             Mang đến những sản phẩm trầm hương thiên nhiên cao cấp nhất,
             chế tác tỉ mỉ từ bàn tay nghệ nhân lành nghề.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 mb-12">
+          <div className="flex flex-col sm:flex-row gap-3 mb-6 md:mb-8">
             <Link
               to="/products"
               className="group inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-br from-[var(--color-gold)] to-[var(--color-gold-dark)] text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:shadow-xl hover:shadow-[var(--color-gold)]/30 hover:-translate-y-0.5 transition-all duration-300"
@@ -65,18 +65,18 @@ export default function HeroSection() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-6 pt-6 border-t border-[var(--color-primary)]/15 max-w-md">
+          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[var(--color-primary)]/15 max-w-md">
             <div>
-              <div className="text-2xl md:text-3xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">10+</div>
-              <div className="text-xs text-gray-500 mt-1">Năm kinh nghiệm</div>
+              <div className="text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">10+</div>
+              <div className="text-[10px] md:text-xs text-gray-500 mt-0.5">Năm kinh nghiệm</div>
             </div>
             <div>
-              <div className="text-2xl md:text-3xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">5K+</div>
-              <div className="text-xs text-gray-500 mt-1">Khách hàng</div>
+              <div className="text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">5K+</div>
+              <div className="text-[10px] md:text-xs text-gray-500 mt-0.5">Khách hàng</div>
             </div>
             <div>
-              <div className="text-2xl md:text-3xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">100%</div>
-              <div className="text-xs text-gray-500 mt-1">Thiên nhiên</div>
+              <div className="text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">100%</div>
+              <div className="text-[10px] md:text-xs text-gray-500 mt-0.5">Thiên nhiên</div>
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function HeroSection() {
           }`}
         >
           {/* Main image */}
-          <div className="relative aspect-[4/5] w-full max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-[var(--color-primary)]/20">
+          <div className="relative aspect-[4/5] w-full max-w-[280px] md:max-w-sm lg:max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-[var(--color-primary)]/20">
             <img
               src={productImage}
               alt="Trầm Hương cao cấp"
@@ -117,9 +117,9 @@ export default function HeroSection() {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center gap-2 text-[var(--color-primary)]/50 text-[10px] tracking-[3px] animate-float">
+      <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center gap-1.5 text-[var(--color-primary)]/60 text-[10px] tracking-[3px] animate-float">
         <span>CUỘN XUỐNG</span>
-        <div className="w-px h-8 bg-gradient-to-b from-[var(--color-primary)]/50 to-transparent" />
+        <div className="w-px h-6 bg-gradient-to-b from-[var(--color-primary)]/60 to-transparent" />
       </div>
     </section>
   );
