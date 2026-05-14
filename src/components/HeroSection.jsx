@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-// Ảnh nền: trầm hương/zen sáng tươi (Unsplash) - thay URL nên nếu muốn
-const heroBanner = 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1920&q=80';
+// Ảnh nền: Agarwood (trầm hương) trong bát sứ - Declan Sun on Unsplash
+const heroBanner = 'https://unsplash.com/photos/ggwjPW1zLGE/download?force=true&w=1920';
 
 export default function HeroSection() {
   const [loaded, setLoaded] = useState(false);
