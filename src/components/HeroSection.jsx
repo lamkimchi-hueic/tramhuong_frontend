@@ -16,7 +16,7 @@ export default function HeroSection() {
   return (
     <section
       id="hero-section"
-      className="relative h-screen min-h-[600px] max-h-[900px] flex items-center overflow-hidden bg-gradient-to-br from-[#faf6ed] via-[#f5ede0] to-[#ebdfc8] pt-20"
+      className="relative h-screen min-h-[640px] max-h-[900px] flex items-center overflow-hidden bg-gradient-to-br from-[#faf6ed] via-[#f5ede0] to-[#ebdfc8] pt-28 md:pt-32"
     >
       {/* Decorative blobs */}
       <div className="absolute top-20 -left-20 w-80 h-80 bg-[var(--color-gold)]/10 rounded-full blur-3xl pointer-events-none" />
@@ -98,17 +98,17 @@ export default function HeroSection() {
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-primary)]/30 via-transparent to-transparent" />
           </div>
 
-          {/* Floating card top-left */}
-          <div className="hidden md:flex absolute -top-4 -left-4 bg-white rounded-xl shadow-xl p-4 items-center gap-3 animate-float">
-            <div className="w-10 h-10 rounded-full bg-[var(--color-gold)]/20 flex items-center justify-center text-[var(--color-gold-dark)] text-lg">✦</div>
+          {/* Floating card top-left (bên trong phạm vi ảnh để không đè navbar) */}
+          <div className="hidden md:flex absolute top-4 left-4 bg-white/95 rounded-xl shadow-xl p-3 items-center gap-2 animate-float">
+            <div className="w-9 h-9 rounded-full bg-[var(--color-gold)]/20 flex items-center justify-center text-[var(--color-gold-dark)]">✦</div>
             <div>
-              <div className="text-sm font-bold text-[var(--color-primary)]">Chứng nhận</div>
-              <div className="text-xs text-gray-500">100% Trầm thật</div>
+              <div className="text-xs font-bold text-[var(--color-primary)]">Chứng nhận</div>
+              <div className="text-[10px] text-gray-500">100% Trầm thật</div>
             </div>
           </div>
 
           {/* Floating card bottom-right */}
-          <div className="hidden md:block absolute -bottom-4 -right-4 bg-white rounded-xl shadow-xl p-4 max-w-[200px]">
+          <div className="hidden md:block absolute bottom-4 right-4 bg-white/95 rounded-xl shadow-xl p-3 max-w-[180px]">
             <div className="flex items-center gap-1 mb-1 text-[var(--color-gold)]">{'★★★★★'}</div>
             <div className="text-xs text-gray-600 leading-relaxed">"Mùi hương tinh tế, chất lượng tuyệt vời."</div>
             <div className="text-[10px] text-gray-400 mt-1 font-semibold">— Khách hàng VIP</div>
