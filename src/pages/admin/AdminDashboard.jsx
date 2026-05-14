@@ -25,8 +25,8 @@ export default function AdminDashboard() {
         let revenueVal = 0;
         try {
           const revRes = await orderAPI.getRevenue();
-          // Adjust logic based on actual backend return format for revenue
-          revenueVal = revRes.data.total || Array.isArray(revRes.data) ? revRes.data.reduce((sum, item) => sum + (item.total || 0), 0) : 0;
+          // Backend trả về { total_revenue: number } - chỉ tính đơn hàng có status 'Completed'
+          revenueVal = Number(revRes.data?.total_revenue) || 0;
         } catch { /* ignore revenue error if endpoint not fully ready */ }
 
         setStats({
