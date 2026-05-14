@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { orderAPI, userAPI, productAPI } from '../../services/api';
-import { FiTrash2, FiRotateCcw, FiArrowLeft, FiPlus, FiX, FiMinus } from 'react-icons/fi';
+import { FiTrash2, FiRotateCcw, FiArrowLeft, FiPlus, FiX, FiMinus, FiEdit2 } from 'react-icons/fi';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -15,6 +15,8 @@ export default function AdminOrders() {
   const [shippingPhone, setShippingPhone] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [orderStatus, setOrderStatus] = useState('Pending');
 
   useEffect(() => {
     fetchOrders();
@@ -38,12 +40,33 @@ export default function AdminOrders() {
   const [guestName, setGuestName] = useState('');
 
   const openCreateModal = () => {
+    setEditingId(null);
     setSelectedUser('');
     setOrderItems([]);
     setShippingPhone('');
     setShippingAddress('');
     setMatchedUser(null);
     setGuestName('');
+    setOrderStatus('Pending');
+    setShowModal(true);
+  };
+
+  const openEditModal = (order) => {
+    setEditingId(order.id_order);
+    setSelectedUser(order.id_user ? String(order.id_user) : '');
+    setShippingPhone(order.shipping_phone || order.user?.phone || '');
+    setShippingAddress(order.shipping_address || order.user?.address || '');
+    setMatchedUser(order.user || null);
+    setGuestName(order.user?.username || '');
+    setOrderStatus(order.status || 'Pending');
+    // map productOrders -> orderItems
+    const items = (order.productOrders || []).map(po => ({
+      id_product: po.id_product,
+      product_name: po.product?.product_name || products.find(p => p.id_product === po.id_product)?.product_name || `SP #${po.id_product}`,
+      price: Number(po.product_price) || 0,
+      quantity: po.product_quantity || 1,
+    }));
+    setOrderItems(items);
     setShowModal(true);
   };
 
@@ -93,24 +116,30 @@ export default function AdminOrders() {
 
   const orderTotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  const handleCreateOrder = async () => {
+  const handleSubmitOrder = async () => {
     if (orderItems.length === 0) return alert('Vui lòng thêm ít nhất 1 sản phẩm!');
     if (!shippingPhone) return alert('Vui lòng nhập số điện thoại!');
     if (!shippingAddress) return alert('Vui lòng nhập địa chỉ giao hàng!');
 
     setSubmitting(true);
     try {
-      await orderAPI.create({
+      const payload = {
         id_user: selectedUser ? parseInt(selectedUser) : null,
         total_amount: orderTotal,
+        status: orderStatus,
         shipping_phone: shippingPhone,
         shipping_address: shippingAddress,
         items: orderItems.map(i => ({ id_product: i.id_product, quantity: i.quantity, price: i.price }))
-      });
+      };
+      if (editingId) {
+        await orderAPI.update(editingId, payload);
+      } else {
+        await orderAPI.create(payload);
+      }
       setShowModal(false);
       fetchOrders();
     } catch (error) {
-      alert(error.response?.data?.message || 'Có lỗi xảy ra khi tạo đơn hàng');
+      alert(error.response?.data?.message || 'Có lỗi xảy ra khi lưu đơn hàng');
     } finally {
       setSubmitting(false);
     }
@@ -323,13 +352,22 @@ export default function AdminOrders() {
                       </select>
                     </td>
                     <td className="p-4 text-center">
-                      <button 
-                        onClick={() => handleDelete(o.id_order)}
-                        className="w-8 h-8 flex items-center justify-center mx-auto rounded bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
-                        title="Xóa"
-                      >
-                        <FiTrash2 size={16} />
-                      </button>
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => openEditModal(o)}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white transition-colors"
+                          title="Sửa"
+                        >
+                          <FiEdit2 size={16} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(o.id_order)}
+                          className="w-8 h-8 flex items-center justify-center rounded bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+                          title="Xóa"
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -345,7 +383,7 @@ export default function AdminOrders() {
       <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
-            <h3 className="text-lg font-bold text-gray-800">Thêm Đơn Hàng Mới</h3>
+            <h3 className="text-lg font-bold text-gray-800">{editingId ? `Sửa Đơn Hàng #${editingId}` : 'Thêm Đơn Hàng Mới'}</h3>
             <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-100 rounded-lg"><FiX size={20} /></button>
           </div>
           <div className="p-6 space-y-5">
@@ -386,6 +424,23 @@ export default function AdminOrders() {
                   placeholder="Nhập tên khách hàng..."
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] outline-none"
                 />
+              </div>
+            )}
+
+            {/* Trạng thái đơn hàng (chỉ hiện khi sửa) */}
+            {editingId && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Trạng thái đơn hàng</label>
+                <select
+                  value={orderStatus}
+                  onChange={(e) => setOrderStatus(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] outline-none"
+                >
+                  <option value="Pending">Đang xử lý</option>
+                  <option value="Confirmed">Đã xác nhận</option>
+                  <option value="Completed">Hoàn thành</option>
+                  <option value="Cancelled">Đã hủy</option>
+                </select>
               </div>
             )}
 
@@ -453,11 +508,11 @@ export default function AdminOrders() {
           <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
             <button onClick={() => setShowModal(false)} className="px-5 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-200">Hủy</button>
             <button
-              onClick={handleCreateOrder}
+              onClick={handleSubmitOrder}
               disabled={submitting}
               className="px-5 py-2.5 bg-[var(--color-primary)] text-white rounded-lg text-sm font-semibold hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
             >
-              {submitting ? 'Đang tạo...' : 'Tạo Đơn Hàng'}
+              {submitting ? 'Đang lưu...' : (editingId ? 'Cập nhật' : 'Tạo Đơn Hàng')}
             </button>
           </div>
         </div>
