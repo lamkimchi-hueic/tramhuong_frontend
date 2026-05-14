@@ -18,7 +18,8 @@ export default function AdminUsers() {
     username: '',
     password: '',
     role: 'Customer',
-    phone: ''
+    phone: '',
+    address: ''
   });
 
   useEffect(() => {
@@ -84,7 +85,8 @@ export default function AdminUsers() {
         username: user.username,
         password: '', // Don't show password
         role: user.role,
-        phone: user.phone || ''
+        phone: user.phone || '',
+        address: user.address || ''
       });
     } else {
       setEditingId(null);
@@ -92,7 +94,8 @@ export default function AdminUsers() {
         username: '',
         password: '',
         role: 'Customer',
-        phone: ''
+        phone: '',
+        address: ''
       });
     }
     setShowModal(true);
@@ -177,12 +180,13 @@ export default function AdminUsers() {
                   <th className="p-4 font-semibold">Tài Khoản</th>
                   <th className="p-4 font-semibold">Quyền</th>
                   <th className="p-4 font-semibold">Số điện thoại</th>
+                  <th className="p-4 font-semibold">Địa chỉ</th>
                   <th className="p-4 font-semibold text-center">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {deletedUsers.length === 0 ? (
-                  <tr><td colSpan="5" className="p-8 text-center text-gray-500">Thùng rác trống</td></tr>
+                  <tr><td colSpan="6" className="p-8 text-center text-gray-500">Thùng rác trống</td></tr>
                 ) : (
                   deletedUsers.map((u) => (
                     <tr key={u.id_user} className="hover:bg-gray-50 transition-colors bg-gray-50/50">
@@ -192,6 +196,7 @@ export default function AdminUsers() {
                         <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-400">{u.role}</span>
                       </td>
                       <td className="p-4 text-gray-400">{u.phone || '-'}</td>
+                      <td className="p-4 text-gray-400 text-sm max-w-[200px] truncate">{u.address || '-'}</td>
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button 
@@ -221,12 +226,13 @@ export default function AdminUsers() {
                   <th className="p-4 font-semibold">Tài Khoản</th>
                   <th className="p-4 font-semibold">Quyền</th>
                   <th className="p-4 font-semibold">Số điện thoại</th>
+                  <th className="p-4 font-semibold">Địa chỉ</th>
                   <th className="p-4 font-semibold text-center">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 min-h-[200px]">
                 {users.length === 0 ? (
-                  <tr><td colSpan="5" className="p-8 text-center text-gray-500">Không có dữ liệu</td></tr>
+                  <tr><td colSpan="6" className="p-8 text-center text-gray-500">Không có dữ liệu</td></tr>
                 ) : (
                   users.map((u) => (
                     <tr key={u.id_user} className="hover:bg-gray-50 transition-colors">
@@ -242,6 +248,7 @@ export default function AdminUsers() {
                         </span>
                       </td>
                       <td className="p-4 text-gray-600">{u.phone || '-'}</td>
+                      <td className="p-4 text-gray-600 text-sm max-w-[200px] truncate">{u.address || '-'}</td>
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button 
@@ -322,6 +329,16 @@ export default function AdminUsers() {
                   type="text" 
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-[var(--color-primary)] outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1 text-gray-700">Địa chỉ</label>
+                <input 
+                  type="text" 
+                  value={formData.address}
+                  onChange={(e) => setFormData({...formData, address: e.target.value})}
+                  placeholder="Nhập địa chỉ..."
                   className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-[var(--color-primary)] outline-none"
                 />
               </div>
