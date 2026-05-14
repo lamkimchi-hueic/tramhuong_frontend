@@ -34,10 +34,10 @@ export default function HeroSection() {
             Tinh Hoa Trầm Hương Việt
           </span>
 
-          <h1 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-[var(--color-primary)] leading-[1.1] mb-5">
+          <h1 className="font-[family-name:var(--font-heading)] text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-[var(--color-primary)] leading-[1.15] mb-5">
             Khám Phá Vẻ Đẹp<br />
             Tinh Khôi Của<br />
-            <span className="relative inline-block">
+            <span className="relative inline-block whitespace-nowrap">
               <span className="text-[var(--color-gold-dark)]">Trầm Hương Tâm An</span>
               <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[var(--color-gold)] to-transparent rounded-full" />
             </span>
