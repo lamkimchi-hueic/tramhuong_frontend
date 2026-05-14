@@ -60,26 +60,22 @@ export default function Header() {
             <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M30 5 L35 20 L45 15 L38 28 L50 30 L38 32 L45 45 L35 40 L30 55 L25 40 L15 45 L22 32 L10 30 L22 28 L15 15 L25 20 Z"
-                fill={isTransparent ? 'rgba(255,255,255,0.9)' : '#2D5016'}
-                stroke={isTransparent ? 'rgba(255,255,255,0.5)' : 'rgba(45,80,22,0.3)'}
+                fill="#2D5016"
+                stroke="rgba(45,80,22,0.3)"
                 strokeWidth="0.5"
               />
               <circle
                 cx="30" cy="30" r="6" fill="none"
-                stroke={isTransparent ? 'rgba(255,255,255,0.7)' : '#C4A35A'}
+                stroke="#C4A35A"
                 strokeWidth="1"
               />
             </svg>
           </div>
           <div className="flex flex-col leading-tight">
-            <span className={`font-[family-name:var(--font-heading)] text-lg font-bold tracking-wide uppercase ${
-              isTransparent ? 'text-white' : 'text-[var(--color-primary)]'
-            }`}>
+            <span className="font-[family-name:var(--font-heading)] text-lg font-bold tracking-wide uppercase text-[#2D5016]">
               Trầm Hương
             </span>
-            <span className={`text-[0.65rem] tracking-[2px] uppercase ${
-              isTransparent ? 'text-white/70' : 'text-gray-500'
-            }`}>
+            <span className="text-[0.65rem] tracking-[2px] uppercase text-[#2D5016]/70">
               Tâm An
             </span>
           </div>
@@ -181,8 +177,8 @@ export default function Header() {
               id="login-btn"
               className={`px-5 py-2 rounded-md text-sm font-semibold transition-all duration-300 ${
                 isTransparent
-                  ? 'border border-white/60 text-white hover:bg-white hover:text-[var(--color-primary)]'
-                  : 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)]'
+                  ? 'border border-[#2D5016]/60 text-[#2D5016] hover:bg-[#2D5016] hover:text-white'
+                  : 'bg-[#2D5016] text-white hover:bg-[var(--color-primary-dark)]'
               }`}
             >
               Đăng Nhập
