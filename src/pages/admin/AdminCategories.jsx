@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { categoryAPI } from '../../services/api';
 import { FiEdit2, FiTrash2, FiPlus, FiX, FiRotateCcw, FiArrowLeft, FiImage, FiUpload } from 'react-icons/fi';
 
-const API_URL = 'http://https://tramhuong-backend.onrender.com';
+const API_URL = 'https://tramhuong-backend.onrender.com';
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState([]);

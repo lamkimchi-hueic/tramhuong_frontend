@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiArrowUpRight } from 'react-icons/fi';
 import { categoryAPI } from '../services/api';
 
-const API_URL = 'http://https://tramhuong-backend.onrender.com';
+const API_URL = 'https://tramhuong-backend.onrender.com';
 
 export default function CategorySection() {
   const [categories, setCategories] = useState([]);
