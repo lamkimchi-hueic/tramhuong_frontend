@@ -75,7 +75,7 @@ export default function Header() {
             <span className="font-[family-name:var(--font-heading)] text-lg font-bold tracking-wide uppercase text-[#2D5016]">
               Trầm Hương
             </span>
-            <span className="text-[0.65rem] tracking-[2px] uppercase text-[#2D5016]/70">
+            <span className="font-[family-name:var(--font-heading)] text-3xl font-bold tracking-wide uppercase text-[#2D5016]/80">
               Tâm An
             </span>
           </div>
