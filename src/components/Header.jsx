@@ -94,7 +94,7 @@ export default function Header() {
               className={`text-sm font-medium tracking-wide uppercase relative pb-1 transition-colors duration-300
                 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-[var(--color-gold)] after:transition-all after:duration-300
                 ${location.pathname === link.to ? 'after:w-full' : 'after:w-0 hover:after:w-full'}
-                ${isTransparent ? 'text-white' : 'text-gray-700 hover:text-[var(--color-primary)]'}
+                ${isTransparent ? 'text-[#2D5016]' : 'text-[#2D5016] hover:text-[var(--color-primary-dark)]'}
               `}
             >
               {link.label}
@@ -119,7 +119,7 @@ export default function Header() {
               id="search-btn"
               onClick={() => setSearchOpen(!searchOpen)}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 relative z-10 ${
-                searchOpen ? 'text-[var(--color-primary)]' : (isTransparent ? 'text-white' : 'text-gray-700')
+                searchOpen ? 'text-[var(--color-primary)]' : 'text-[#2D5016]'
               } hover:bg-[var(--color-primary)]/10`}
             >
               {searchOpen ? <FiX size={18} /> : <FiSearch size={18} />}
@@ -129,9 +129,7 @@ export default function Header() {
           <Link
             to="/cart"
             id="cart-btn"
-            className={`w-10 h-10 rounded-full flex items-center justify-center relative transition-all duration-300 hover:bg-[var(--color-primary)]/10 ${
-              isTransparent ? 'text-white' : 'text-gray-700'
-            }`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center relative transition-all duration-300 hover:bg-[var(--color-primary)]/10 text-[#2D5016]`}
           >
             <FiShoppingCart size={18} />
             {itemCount > 0 && (
@@ -148,9 +146,7 @@ export default function Header() {
               <button
                 id="user-menu-btn"
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:bg-[var(--color-primary)]/10 ${
-                  isTransparent ? 'text-white' : 'text-gray-700'
-                }`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:bg-[var(--color-primary)]/10 text-[#2D5016]`}
               >
                 <FiUser size={18} />
               </button>
@@ -198,7 +194,7 @@ export default function Header() {
         <button
           id="hamburger-btn"
           onClick={() => setMenuOpen(!menuOpen)}
-          className={`md:hidden z-50 text-xl ${isTransparent ? 'text-white' : 'text-gray-700'}`}
+          className={`md:hidden z-50 text-xl text-[#2D5016]`}
         >
           {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
