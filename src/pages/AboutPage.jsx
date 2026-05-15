@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiHome, FiChevronRight } from 'react-icons/fi';
-import aboutImg from '../assets/images/about_process.png';
-import blogImg from '../assets/images/blog_lifestyle.png';
+const aboutImg = 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780029/tramhuong/assets/about_process.jpg';
+const blogImg = 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780032/tramhuong/assets/blog_lifestyle.jpg';
 
 const values = [
   { emoji: '🌿', title: 'Thiên Nhiên Thuần Khiết', desc: '100% trầm hương tự nhiên, không pha tạp. Nguyên liệu được tuyển chọn từ các vùng trầm hương nổi tiếng.' },

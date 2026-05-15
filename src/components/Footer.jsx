@@ -115,7 +115,7 @@ export default function Footer() {
               <button
                 id="newsletter-submit"
                 type="submit"
-                className="px-4 py-3 bg-[var(--color-gold)] text-white rounded-md font-semibold text-sm hover:bg-[var(--color-gold-light)] transition-colors"
+                className="px-4 py-3 bg-[var(--color-primary)] text-white rounded-md font-semibold text-sm hover:bg-[var(--color-primary-dark)] transition-colors"
               >
                 <FiSend size={16} />
               </button>

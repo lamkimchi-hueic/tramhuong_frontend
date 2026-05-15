@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FiSun, FiHeart, FiWind, FiDroplet, FiChevronRight } from 'react-icons/fi';
-import blogImg from '../assets/images/blog_lifestyle.png';
+const blogImg = 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780032/tramhuong/assets/blog_lifestyle.jpg';
 
 const features = [
   { icon: FiSun, title: 'Tinh thần sảng khoái', desc: 'Trầm hương giúp tĩnh tâm, giảm căng thẳng hiệu quả' },

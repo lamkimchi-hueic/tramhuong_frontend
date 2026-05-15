@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
-import productImage from '../assets/images/thac.jpg';
-
+const productImage = 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780041/tramhuong/assets/thac.jpg';
 const altImage = 'https://images.unsplash.com/photo-1545048702-79362596cdc9?auto=format&fit=crop&w=1200&q=85';
 
 export default function HeroSection() {
@@ -50,7 +49,7 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-3 mb-6 md:mb-8">
             <Link
               to="/products"
-              className="group inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-br from-[var(--color-gold)] to-[var(--color-gold-dark)] text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:shadow-xl hover:shadow-[var(--color-gold)]/30 hover:-translate-y-0.5 transition-all duration-300"
+              className="group inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:shadow-xl hover:shadow-[var(--color-primary)]/30 hover:-translate-y-0.5 transition-all duration-300"
             >
               Bộ Sưu Tập Cao Cấp
               <FiArrowRight className="group-hover:translate-x-1 transition-transform" />

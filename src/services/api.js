@@ -2,6 +2,15 @@ import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
+// Helper: resolve image URL — nếu đã là URL đầy đủ (Cloudinary/Unsplash) thì giữ nguyên,
+// ngược lại prefix backend base (cho ảnh upload kiểu /uploads/...)
+export const resolveImageUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const base = (API_BASE_URL || '').replace(/\/api\/?$/, '');
+  return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
