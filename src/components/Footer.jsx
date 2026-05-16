@@ -36,7 +36,7 @@ export default function Footer() {
   };
 
   return (
-    <footer id="footer" className="bg-[var(--color-primary-dark)] text-white pt-20">
+    <footer id="footer" className="bg-[var(--color-primary)] text-white pt-20">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10">
           {/* Brand */}
@@ -53,7 +53,7 @@ export default function Footer() {
                 <a
                   key={idx}
                   href="#"
-                  className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-sm hover:bg-[var(--color-gold)] hover:-translate-y-1 transition-all duration-300"
+                  className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-sm hover:bg-[var(--color-gold)] hover:-translate-y-1 transition-all duration-300"
                 >
                   <Icon size={16} />
                 </a>
