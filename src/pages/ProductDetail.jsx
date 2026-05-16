@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { productAPI } from '../services/api';
+import { productAPI, resolveImageUrl } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { FiHome, FiChevronRight, FiShoppingBag, FiHeart, FiMinus, FiPlus, FiCheckCircle } from 'react-icons/fi';
 
@@ -79,8 +79,8 @@ export default function ProductDetail() {
             <div className="rounded-2xl overflow-hidden bg-[var(--color-cream)]">
               <img
                 src={product.image_url
-                  ? `http://https://tramhuong-backend.onrender.com${product.image_url}`
-                  : `https://picsum.photos/seed/tram${product.id_product}/600/600`
+                  ? resolveImageUrl(product.image_url)
+                  : `https://placehold.co/600x600/E8F0E0/2D5016?text=Tram+Huong`
                 }
                 alt={product.product_name}
                 className="w-full aspect-square object-cover"

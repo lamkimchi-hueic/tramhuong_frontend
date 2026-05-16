@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowUpRight } from 'react-icons/fi';
-import { categoryAPI } from '../services/api';
-
-const API_URL = 'https://tramhuong-backend.onrender.com';
+import { categoryAPI, resolveImageUrl } from '../services/api';
 
 export default function CategorySection() {
   const [categories, setCategories] = useState([]);
@@ -46,7 +44,7 @@ export default function CategorySection() {
             >
               {cat.image_url ? (
                 <img
-                  src={`${API_URL}${cat.image_url}`}
+                  src={resolveImageUrl(cat.image_url)}
                   alt={cat.category_name}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108"
