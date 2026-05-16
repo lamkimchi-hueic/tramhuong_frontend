@@ -27,26 +27,26 @@ export default function HeroSection() {
             loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/70 backdrop-blur border border-[var(--color-gold)]/40 rounded-full text-[var(--color-gold-dark)] text-xs font-semibold tracking-[2px] uppercase mb-6 shadow-sm">
+          <span className={`inline-flex items-center gap-2 px-4 py-1.5 bg-white/70 backdrop-blur border border-[var(--color-gold)]/40 rounded-full text-[var(--color-gold-dark)] text-xs font-semibold tracking-[2px] uppercase mb-6 shadow-sm transition-all duration-700 delay-300 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}>
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)]" />
             Tinh Hoa Trầm Hương Việt
           </span>
 
-          <h1 className="font-[family-name:var(--font-heading)] text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-[var(--color-primary)] leading-[1.15] mb-5">
+          <h1 className={`font-[family-name:var(--font-heading)] text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-[var(--color-primary)] leading-[1.15] mb-5 transition-all duration-1000 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             Khám Phá Vẻ Đẹp<br />
             Tinh Khôi Của<br />
             <span className="relative inline-block whitespace-nowrap">
               <span className="text-[var(--color-gold-dark)]">Trầm Hương Tâm An</span>
-              <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[var(--color-gold)] to-transparent rounded-full" />
+              <span className={`absolute -bottom-2 left-0 h-1 bg-gradient-to-r from-[var(--color-gold)] to-transparent rounded-full transition-all duration-1000 delay-700 ${loaded ? 'right-0' : 'right-full'}`} />
             </span>
           </h1>
 
-          <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-6 max-w-lg">
+          <p className={`text-sm md:text-base text-gray-600 leading-relaxed mb-6 max-w-lg transition-all duration-800 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             Mang đến những sản phẩm trầm hương thiên nhiên cao cấp nhất,
             chế tác tỉ mỉ từ bàn tay nghệ nhân lành nghề.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 mb-6 md:mb-8">
+          <div className={`flex flex-col sm:flex-row gap-3 mb-6 md:mb-8 transition-all duration-800 delay-500 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             <Link
               to="/products"
               className="group inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[var(--color-primary)] text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:shadow-xl hover:shadow-[var(--color-primary)]/30 hover:-translate-y-0.5 transition-all duration-300"
@@ -63,7 +63,7 @@ export default function HeroSection() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[var(--color-primary)]/15 max-w-md">
+          <div className={`grid grid-cols-3 gap-4 pt-4 border-t border-[var(--color-primary)]/15 max-w-md transition-all duration-800 delay-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             <div>
               <div className="text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">10+</div>
               <div className="text-[10px] md:text-xs text-gray-500 mt-0.5">Năm kinh nghiệm</div>
@@ -81,23 +81,23 @@ export default function HeroSection() {
 
         {/* RIGHT: Product image card */}
         <div
-          className={`relative transition-all duration-1000 delay-200 ${
-            loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          className={`relative transition-all duration-1000 delay-300 ${
+            loaded ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-95'
           }`}
         >
           {/* Main image */}
-          <div className="relative aspect-[4/5] w-full max-w-[280px] md:max-w-sm lg:max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-[var(--color-primary)]/20">
+          <div className="relative aspect-[4/5] w-full max-w-[280px] md:max-w-sm lg:max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-[var(--color-primary)]/20 img-hover-zoom">
             <img
               src={productImage}
               alt="Trầm Hương cao cấp"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover img-ken-burns"
               onError={(e) => { e.currentTarget.src = altImage; }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-primary)]/30 via-transparent to-transparent" />
           </div>
 
           {/* Floating card top-left (bên trong phạm vi ảnh để không đè navbar) */}
-          <div className="hidden md:flex absolute top-4 left-4 bg-white/95 rounded-xl shadow-xl p-3 items-center gap-2 animate-float">
+          <div className={`hidden md:flex absolute top-4 left-4 bg-white/95 rounded-xl shadow-xl p-3 items-center gap-2 animate-float transition-all duration-700 delay-700 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'}`}>
             <div className="w-9 h-9 rounded-full bg-[var(--color-gold)]/20 flex items-center justify-center text-[var(--color-gold-dark)]">✦</div>
             <div>
               <div className="text-xs font-bold text-[var(--color-primary)]">Chứng nhận</div>
@@ -106,7 +106,7 @@ export default function HeroSection() {
           </div>
 
           {/* Floating card bottom-right */}
-          <div className="hidden md:block absolute bottom-4 right-4 bg-white/95 rounded-xl shadow-xl p-3 max-w-[180px]">
+          <div className={`hidden md:block absolute bottom-4 right-4 bg-white/95 rounded-xl shadow-xl p-3 max-w-[180px] transition-all duration-700 delay-900 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
             <div className="flex items-center gap-1 mb-1 text-[var(--color-gold)]">{'★★★★★'}</div>
             <div className="text-xs text-gray-600 leading-relaxed">"Mùi hương tinh tế, chất lượng tuyệt vời."</div>
             <div className="text-[10px] text-gray-400 mt-1 font-semibold">— Khách hàng VIP</div>

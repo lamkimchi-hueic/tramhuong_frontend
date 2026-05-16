@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import useScrollReveal from '../hooks/useScrollReveal';
 
 const testimonials = [
   { id: 1, text: 'Mình rất hài lòng với sản phẩm vòng tay trầm hương. Hương thơm dịu nhẹ, đeo rất thoải mái. Sẽ ủng hộ tiếp!', name: 'Nguyễn Minh Anh', initials: 'NA', rating: 5 },
@@ -9,35 +10,33 @@ const testimonials = [
 
 export default function TestimonialSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { ref: sectionRef, isVisible } = useScrollReveal({ threshold: 0.1 });
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % testimonials.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length);
 
   return (
-    <section id="testimonials" className="py-24 bg-[var(--color-cream)]">
+    <section id="testimonials" className="py-24 bg-[var(--color-cream)]" ref={sectionRef}>
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-[var(--color-primary)] text-center mb-4">
+        <h2 className={`font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-[var(--color-primary)] text-center mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           Cảm Nhận Khách Hàng
         </h2>
-        <div className="w-16 h-[3px] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-gold-light)] mx-auto rounded-full mb-3" />
-        <p className="text-gray-500 text-center mb-12 max-w-lg mx-auto">
+        <div className={`w-16 h-[3px] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-gold-light)] mx-auto rounded-full mb-3 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`} />
+        <p className={`text-gray-500 text-center mb-12 max-w-lg mx-auto transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           Những chia sẻ chân thực từ khách hàng đã tin tưởng và sử dụng sản phẩm
         </p>
 
         {/* Desktop Grid */}
         <div className="hidden md:grid grid-cols-3 gap-6">
-          {testimonials.map((t) => (
-            <div
-              key={t.id}
-              id={`testimonial-${t.id}`}
-              className="bg-white rounded-xl p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+          {testimonials.map((t, idx) => (
+            <div key={t.id} id={`testimonial-${t.id}`}
+              className={`bg-white rounded-xl p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-lg ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+              style={{ transitionDelay: isVisible ? `${300 + idx * 150}ms` : '0ms' }}
             >
               <div className="font-[family-name:var(--font-heading)] text-4xl text-[var(--color-primary-100)] mb-4">"</div>
               <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">{t.text}</p>
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">
-                  {t.initials}
-                </div>
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{t.initials}</div>
                 <div>
                   <h4 className="text-sm font-semibold text-gray-800">{t.name}</h4>
                   <div className="flex gap-0.5">
@@ -53,13 +52,11 @@ export default function TestimonialSection() {
 
         {/* Mobile Carousel */}
         <div className="md:hidden">
-          <div className="bg-white rounded-xl p-8">
+          <div className={`bg-white rounded-xl p-8 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
             <div className="font-[family-name:var(--font-heading)] text-4xl text-[var(--color-primary-100)] mb-4">"</div>
             <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">{testimonials[currentSlide].text}</p>
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">
-                {testimonials[currentSlide].initials}
-              </div>
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{testimonials[currentSlide].initials}</div>
               <div>
                 <h4 className="text-sm font-semibold text-gray-800">{testimonials[currentSlide].name}</h4>
                 <div className="flex gap-0.5">
@@ -70,32 +67,14 @@ export default function TestimonialSection() {
               </div>
             </div>
           </div>
-
-          {/* Carousel Controls */}
           <div className="flex items-center justify-center gap-4 mt-6">
-            <button
-              onClick={prevSlide}
-              className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"
-            >
-              <FiChevronLeft size={18} />
-            </button>
+            <button onClick={prevSlide} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"><FiChevronLeft size={18} /></button>
             <div className="flex gap-2">
               {testimonials.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                    idx === currentSlide ? 'bg-[var(--color-primary)] w-6' : 'bg-gray-300'
-                  }`}
-                />
+                <button key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentSlide ? 'bg-[var(--color-primary)] w-6' : 'bg-gray-300'}`} />
               ))}
             </div>
-            <button
-              onClick={nextSlide}
-              className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"
-            >
-              <FiChevronRight size={18} />
-            </button>
+            <button onClick={nextSlide} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"><FiChevronRight size={18} /></button>
           </div>
         </div>
       </div>

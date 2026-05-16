@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowUpRight } from 'react-icons/fi';
 import { categoryAPI, resolveImageUrl } from '../services/api';
+import useScrollReveal from '../hooks/useScrollReveal';
 
 export default function CategorySection() {
   const [categories, setCategories] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
+  const { ref: sectionRef, isVisible } = useScrollReveal({ threshold: 0.1 });
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -22,23 +24,24 @@ export default function CategorySection() {
   if (categories.length === 0) return null;
 
   return (
-    <section id="categories" className="py-24 bg-white">
+    <section id="categories" className="py-24 bg-white" ref={sectionRef}>
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-[var(--color-primary)] text-center mb-4">
+        <h2 className={`font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-[var(--color-primary)] text-center mb-4 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           Danh Mục Sản Phẩm
         </h2>
-        <div className="w-16 h-[3px] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-gold-light)] mx-auto rounded-full mb-3" />
-        <p className="text-gray-500 text-center mb-12 max-w-lg mx-auto">
+        <div className={`w-16 h-[3px] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-gold-light)] mx-auto rounded-full mb-3 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`} />
+        <p className={`text-gray-500 text-center mb-12 max-w-lg mx-auto transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
           Khám phá các dòng sản phẩm trầm hương cao cấp được tuyển chọn kỹ lưỡng
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          {categories.map((cat) => (
+          {categories.map((cat, idx) => (
             <Link
               key={cat.id_category}
               to={`/products?category=${cat.id_category}`}
               id={`category-${cat.id_category}`}
-              className="group relative rounded-xl overflow-hidden aspect-[4/5] cursor-pointer"
+              className={`group relative rounded-xl overflow-hidden aspect-[4/5] cursor-pointer transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+              style={{ transitionDelay: isVisible ? `${300 + idx * 150}ms` : '0ms' }}
               onMouseEnter={() => setHoveredId(cat.id_category)}
               onMouseLeave={() => setHoveredId(null)}
             >

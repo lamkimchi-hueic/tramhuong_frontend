@@ -6,10 +6,12 @@ import CategorySection from '../components/CategorySection';
 import ProductCard from '../components/ProductCard';
 import BlogSection from '../components/BlogSection';
 import TestimonialSection from '../components/TestimonialSection';
+import useScrollReveal from '../hooks/useScrollReveal';
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { ref: productsRef, isVisible: productsVisible } = useScrollReveal({ threshold: 0.05 });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -31,13 +33,13 @@ export default function HomePage() {
       <CategorySection />
 
       {/* Featured Products */}
-      <section id="featured-products" className="py-24 bg-[var(--color-cream)]">
+      <section id="featured-products" className="py-24 bg-[var(--color-cream)]" ref={productsRef}>
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-[var(--color-primary)] text-center mb-4">
+          <h2 className={`font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-[var(--color-primary)] text-center mb-4 transition-all duration-700 ${productsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             Sản Phẩm Nổi Bật
           </h2>
-          <div className="w-16 h-[3px] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-gold-light)] mx-auto rounded-full mb-3" />
-          <p className="text-gray-500 text-center mb-12 max-w-lg mx-auto">
+          <div className={`w-16 h-[3px] bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-gold-light)] mx-auto rounded-full mb-3 transition-all duration-700 delay-150 ${productsVisible ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'}`} />
+          <p className={`text-gray-500 text-center mb-12 max-w-lg mx-auto transition-all duration-700 delay-200 ${productsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             Những sản phẩm trầm hương được yêu thích và đánh giá cao nhất
           </p>
 
@@ -48,11 +50,17 @@ export default function HomePage() {
           ) : featuredProducts.length > 0 ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {featuredProducts.map((product) => (
-                  <ProductCard key={product.id_product} product={product} />
+                {featuredProducts.map((product, idx) => (
+                  <div
+                    key={product.id_product}
+                    className={`transition-all duration-600 ${productsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                    style={{ transitionDelay: productsVisible ? `${300 + idx * 100}ms` : '0ms' }}
+                  >
+                    <ProductCard product={product} />
+                  </div>
                 ))}
               </div>
-              <div className="text-center mt-12">
+              <div className={`text-center mt-12 transition-all duration-700 delay-1000 ${productsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
                 <Link
                   to="/products"
                   id="view-all-products"
