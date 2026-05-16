@@ -51,7 +51,7 @@ export default function ProductPage() {
   return (
     <main id="product-page">
       {/* Page Header */}
-      <div className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] pt-36 pb-16 text-center">
+      <div className="bg-[var(--color-primary)] pt-36 pb-16 text-center">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="font-[family-name:var(--font-heading)] text-4xl font-bold text-white mb-3">Sản Phẩm</h1>
           <p className="text-white/70">Khám phá bộ sưu tập trầm hương cao cấp của chúng tôi</p>

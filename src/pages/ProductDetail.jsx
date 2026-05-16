@@ -59,7 +59,7 @@ export default function ProductDetail() {
   return (
     <main id="product-detail-page">
       {/* Breadcrumb Header */}
-      <div className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] pt-28 pb-8">
+      <div className="bg-[var(--color-primary)] pt-28 pb-8">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-2 text-sm text-white/50">
             <Link to="/" className="text-white/70 hover:text-[var(--color-gold-light)]"><FiHome size={14} /></Link>
