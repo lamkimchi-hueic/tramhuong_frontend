@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { orderAPI, authAPI } from '../services/api';
+import { orderAPI, authAPI, resolveImageUrl } from '../services/api';
 import { FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiArrowLeft, FiCheckCircle, FiMapPin, FiPhone } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 
@@ -116,9 +116,13 @@ export default function CartPage() {
                 <div key={item.id_product} className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 animate-fade-in">
                   <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                     <img
-                      src={`https://picsum.photos/seed/tram${item.id_product}/200/200`}
+                      src={item.image_url
+                        ? resolveImageUrl(item.image_url)
+                        : `https://placehold.co/200x200/E8F0E0/2D5016?text=Tram+Huong`
+                      }
                       alt={item.product_name}
                       className="w-full h-full object-cover"
+                      onError={(e) => { e.target.src = 'https://placehold.co/200x200/E8F0E0/2D5016?text=Tram+Huong'; }}
                     />
                   </div>
                   <div className="flex-1 min-w-0">

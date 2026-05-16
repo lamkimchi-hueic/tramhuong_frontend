@@ -27,7 +27,7 @@ export default function ProductCard({ product }) {
               ? 'https://placehold.co/400x400/E8F0E0/2D5016?text=Tram+Huong'
               : product.image_url
                 ? resolveImageUrl(product.image_url)
-                : `https://picsum.photos/seed/tram${product.id_product}/400/400`
+                : `https://placehold.co/400x400/E8F0E0/2D5016?text=Tram+Huong`
             }
             alt={product.product_name}
             loading="lazy"
