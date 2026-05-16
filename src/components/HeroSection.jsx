@@ -49,7 +49,7 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-3 mb-6 md:mb-8">
             <Link
               to="/products"
-              className="group inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:shadow-xl hover:shadow-[var(--color-primary)]/30 hover:-translate-y-0.5 transition-all duration-300"
+              className="group inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-[var(--color-primary)] text-white font-semibold text-sm uppercase tracking-wide rounded-lg hover:shadow-xl hover:shadow-[var(--color-primary)]/30 hover:-translate-y-0.5 transition-all duration-300"
             >
               Bộ Sưu Tập Cao Cấp
               <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
