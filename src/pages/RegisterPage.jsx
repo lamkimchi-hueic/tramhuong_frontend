@@ -55,7 +55,7 @@ export default function RegisterPage() {
         </p>
 
         {error && <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm text-center mb-4">{error}</div>}
-        {success && <div className="bg-green-50 text-green-600 px-4 py-3 rounded-lg text-sm text-center mb-4">{success}</div>}
+        {success && <div className="bg-[var(--color-primary-50)] text-[var(--color-primary)] px-4 py-3 rounded-lg text-sm text-center mb-4">{success}</div>}
 
         <form onSubmit={handleSubmit}>
           {fields.map((f) => (

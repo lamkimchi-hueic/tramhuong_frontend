@@ -71,7 +71,7 @@ export default function CartPage() {
     return (
       <main className="pt-32 pb-24 bg-gray-50 min-h-screen">
         <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-10 text-center animate-fade-in-up">
-          <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-[var(--color-primary-50)] text-[var(--color-primary)] rounded-full flex items-center justify-center mx-auto mb-6">
             <FiCheckCircle size={40} />
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Đặt hàng thành công!</h1>
@@ -206,7 +206,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Phí vận chuyển</span>
-                  <span className="text-green-600 font-medium">Miễn phí</span>
+                  <span className="text-[var(--color-primary)] font-medium">Miễn phí</span>
                 </div>
                 <div className="pt-4 border-t border-gray-100 flex justify-between items-end">
                   <span className="font-bold text-gray-800">Tổng cộng</span>

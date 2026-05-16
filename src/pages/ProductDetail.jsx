@@ -100,7 +100,7 @@ export default function ProductDetail() {
 
               <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-6 ${
                 product.product_status
-                  ? 'bg-green-50 text-green-700'
+                  ? 'bg-[var(--color-primary-50)] text-[var(--color-primary)]'
                   : 'bg-red-50 text-red-700'
               }`}>
                 <FiCheckCircle size={13} />
@@ -146,7 +146,7 @@ export default function ProductDetail() {
                   onClick={handleAddToCart}
                   className={`flex-1 inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-md font-semibold text-sm uppercase tracking-wide transition-all duration-300 ${
                     addedToCart
-                      ? 'bg-green-600 text-white'
+                      ? 'bg-[var(--color-primary)] text-white'
                       : 'bg-[var(--color-primary)] text-white border-2 border-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] hover:-translate-y-0.5 hover:shadow-lg'
                   }`}
                 >

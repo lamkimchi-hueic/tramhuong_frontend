@@ -181,7 +181,7 @@ export default function AdminCategories() {
                       <div className="flex items-center justify-center gap-2">
                         <button 
                           onClick={() => handleRestore(c.id_category)}
-                          className="px-3 py-1.5 rounded bg-green-50 text-green-600 hover:bg-green-500 hover:text-white transition-colors text-sm font-semibold flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded bg-[var(--color-primary-50)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors text-sm font-semibold flex items-center gap-1.5"
                         >
                           <FiRotateCcw size={14} /> Khôi phục
                         </button>

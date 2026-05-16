@@ -91,7 +91,7 @@ export default function ContactPage() {
               </h2>
 
               {submitted && (
-                <div className="bg-green-50 text-green-600 px-4 py-3 rounded-lg text-sm text-center mb-4">
+                <div className="bg-[var(--color-primary-50)] text-[var(--color-primary)] px-4 py-3 rounded-lg text-sm text-center mb-4">
                   ✓ Cảm ơn bạn! Chúng tôi sẽ phản hồi sớm nhất.
                 </div>
               )}

@@ -61,7 +61,7 @@ export default function ProfilePage() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Completed': return 'text-green-600 bg-green-50';
+      case 'Completed': return 'text-[var(--color-primary)] bg-[var(--color-primary-50)]';
       case 'Confirmed': return 'text-blue-600 bg-blue-50';
       case 'Cancelled': return 'text-red-600 bg-red-50';
       default: return 'text-yellow-600 bg-yellow-50';
@@ -108,7 +108,7 @@ export default function ProfilePage() {
               </button>
 
               {message && (
-                <div className="mt-4 p-2 bg-green-50 text-green-600 text-xs rounded-md flex items-center justify-center gap-1">
+                <div className="mt-4 p-2 bg-[var(--color-primary-50)] text-[var(--color-primary)] text-xs rounded-md flex items-center justify-center gap-1">
                   <FiCheckCircle size={12} /> {message}
                 </div>
               )}

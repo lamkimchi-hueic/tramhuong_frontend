@@ -100,7 +100,7 @@ export default function Footer() {
               Đăng ký để nhận thông tin mới nhất về sản phẩm và ưu đãi đặc biệt.
             </p>
             {subscribed && (
-              <div className="text-sm text-green-300 mb-3">✓ Cảm ơn bạn đã đăng ký!</div>
+              <div className="text-sm text-[var(--color-primary-100)] mb-3">✓ Cảm ơn bạn đã đăng ký!</div>
             )}
             <form onSubmit={handleSubmit} className="flex gap-2">
               <input

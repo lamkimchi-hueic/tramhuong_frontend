@@ -215,7 +215,7 @@ export default function AdminOrders() {
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'Completed': return 'bg-green-50 text-green-600 border border-green-200';
+      case 'Completed': return 'bg-[var(--color-primary-50)] text-[var(--color-primary)] border border-[var(--color-primary-100)]';
       case 'Confirmed': return 'bg-blue-50 text-blue-600 border border-blue-200';
       case 'Cancelled': return 'bg-red-50 text-red-600 border border-red-200';
       default: return 'bg-yellow-50 text-yellow-600 border border-yellow-200'; // Pending
@@ -296,7 +296,7 @@ export default function AdminOrders() {
                       <div className="flex items-center justify-center gap-2">
                         <button 
                           onClick={() => handleRestore(o.id_order)}
-                          className="px-3 py-1.5 rounded bg-green-50 text-green-600 hover:bg-green-500 hover:text-white transition-colors text-sm font-semibold flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded bg-[var(--color-primary-50)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors text-sm font-semibold flex items-center gap-1.5"
                         >
                           <FiRotateCcw size={14} /> Khôi phục
                         </button>
@@ -400,9 +400,9 @@ export default function AdminOrders() {
               {shippingPhone.trim().length >= 3 && (
                 <div className="mt-2">
                   {matchedUser ? (
-                    <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-sm">
-                      <span className="text-green-600 font-semibold">✓</span>
-                      <span className="text-green-700">Khách hàng: <strong>{matchedUser.username}</strong></span>
+                    <div className="flex items-center gap-2 px-3 py-2 bg-[var(--color-primary-50)] border border-[var(--color-primary-100)] rounded-lg text-sm">
+                      <span className="text-[var(--color-primary)] font-semibold">✓</span>
+                      <span className="text-[var(--color-primary-dark)]">Khách hàng: <strong>{matchedUser.username}</strong></span>
                     </div>
                   ) : (
                     <div className="px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">

@@ -73,7 +73,7 @@ export default function AdminSettings() {
 
       {message && (
         <div className={`mx-6 mt-4 px-4 py-3 rounded-lg text-sm font-medium ${
-          message.includes('lỗi') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'
+          message.includes('lỗi') ? 'bg-red-50 text-red-600' : 'bg-[var(--color-primary-50)] text-[var(--color-primary)]'
         }`}>
           {message}
         </div>
