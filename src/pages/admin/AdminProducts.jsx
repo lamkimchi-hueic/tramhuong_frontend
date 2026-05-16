@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { productAPI, categoryAPI } from '../../services/api';
+import { productAPI, categoryAPI, resolveImageUrl } from '../../services/api';
 import { FiEdit2, FiTrash2, FiPlus, FiX, FiImage, FiUpload, FiRotateCcw, FiArrowLeft, FiMinus } from 'react-icons/fi';
-
-const API_URL = 'https://tramhuong-backend.onrender.com';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -89,7 +87,7 @@ export default function AdminProducts() {
         product_status: product.product_status ? 1 : 0
       });
       setVariants(product.variants?.map(v => ({ size: v.size, price: v.price, stock: v.stock })) || []);
-      setImagePreview(product.image_url ? `${API_URL}${product.image_url}` : null);
+      setImagePreview(product.image_url ? resolveImageUrl(product.image_url) : null);
     } else {
       setEditingId(null);
       setFormData({ product_name: '', id_category: categories[0]?.id_category || '', product_price: '', product_status: 1 });
@@ -214,7 +212,7 @@ export default function AdminProducts() {
                     <tr key={p.id_product} className="hover:bg-gray-50 transition-colors bg-gray-50/50">
                       <td className="p-4">
                         {p.image_url ? (
-                          <img src={`${API_URL}${p.image_url}`} alt={p.product_name} className="w-12 h-12 object-cover rounded-lg border border-gray-100 opacity-60" />
+                          <img src={resolveImageUrl(p.image_url)} alt={p.product_name} className="w-12 h-12 object-cover rounded-lg border border-gray-100 opacity-60" />
                         ) : (
                           <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-300"><FiImage size={18} /></div>
                         )}
@@ -265,7 +263,7 @@ export default function AdminProducts() {
                       <td className="p-4">
                         {p.image_url ? (
                           <img 
-                            src={`${API_URL}${p.image_url}`} 
+                            src={resolveImageUrl(p.image_url)} 
                             alt={p.product_name}
                             className="w-12 h-12 object-cover rounded-lg border border-gray-100"
                           />

@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { categoryAPI } from '../../services/api';
+import { categoryAPI, resolveImageUrl } from '../../services/api';
 import { FiEdit2, FiTrash2, FiPlus, FiX, FiRotateCcw, FiArrowLeft, FiImage, FiUpload } from 'react-icons/fi';
-
-const API_URL = 'https://tramhuong-backend.onrender.com';
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState([]);
@@ -73,7 +71,7 @@ export default function AdminCategories() {
     if (category) {
       setEditingId(category.id_category);
       setFormData({ category_name: category.category_name });
-      setImagePreview(category.image_url ? `${API_URL}${category.image_url}` : null);
+      setImagePreview(category.image_url ? resolveImageUrl(category.image_url) : null);
     } else {
       setEditingId(null);
       setFormData({ category_name: '' });
@@ -219,7 +217,7 @@ export default function AdminCategories() {
                     <td className="p-4 text-gray-600">{c.id_category}</td>
                     <td className="p-4">
                       {c.image_url ? (
-                        <img src={`${API_URL}${c.image_url}`} alt={c.category_name} className="w-12 h-12 object-cover rounded-lg border border-gray-100" />
+                        <img src={resolveImageUrl(c.image_url)} alt={c.category_name} className="w-12 h-12 object-cover rounded-lg border border-gray-100" />
                       ) : (
                         <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-300"><FiImage size={18} /></div>
                       )}
