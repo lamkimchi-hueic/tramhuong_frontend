@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { productAPI, resolveImageUrl } from '../services/api';
 import { useCart } from '../context/CartContext';
-import { FiHome, FiChevronRight, FiShoppingBag, FiHeart, FiMinus, FiPlus, FiCheckCircle } from 'react-icons/fi';
+import { FiHome, FiChevronRight, FiShoppingBag, FiHeart, FiMinus, FiPlus, FiCheckCircle, FiZoomIn } from 'react-icons/fi';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -11,10 +11,15 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [liked, setLiked] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
+  const [lensPos, setLensPos] = useState({ x: 50, y: 50 });
+  const imgContainerRef = useRef(null);
   const { addToCart } = useCart();
 
   useEffect(() => {
     setLoading(true);
+    setImgLoaded(false);
     productAPI.getById(id)
       .then((res) => setProduct(res.data))
       .catch((err) => console.error('Lỗi:', err))
@@ -30,6 +35,23 @@ export default function ProductDetail() {
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2000);
     }
+  };
+
+  const imageUrl = product?.image_url
+    ? resolveImageUrl(product.image_url)
+    : 'https://placehold.co/600x600/E8F0E0/2D5016?text=Tram+Huong';
+
+  // If image is from Cloudinary, request optimized size
+  const optimizedImageUrl = imageUrl.includes('cloudinary.com')
+    ? imageUrl.replace('/upload/', '/upload/w_800,f_auto,q_auto/')
+    : imageUrl;
+
+  const handleMouseMove = (e) => {
+    if (!imgContainerRef.current) return;
+    const rect = imgContainerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setLensPos({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
   };
 
   if (loading) {
@@ -72,29 +94,55 @@ export default function ProductDetail() {
       </div>
 
       {/* Product Detail */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-            {/* Image */}
-            <div className="rounded-2xl overflow-hidden bg-[var(--color-cream)]">
-              <img
-                src={product.image_url
-                  ? resolveImageUrl(product.image_url)
-                  : `https://placehold.co/600x600/E8F0E0/2D5016?text=Tram+Huong`
-                }
-                alt={product.product_name}
-                className="w-full aspect-square object-cover"
-                onError={(e) => { e.target.src = 'https://placehold.co/600x600/E8F0E0/2D5016?text=Tram+Huong'; }}
-              />
+      <section className="py-10 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-start">
+            {/* Image — constrained & zoomable */}
+            <div className="lg:sticky lg:top-28">
+              <div
+                ref={imgContainerRef}
+                className="relative rounded-2xl overflow-hidden bg-[var(--color-cream)] cursor-zoom-in group max-w-lg mx-auto"
+                onMouseEnter={() => setZoomed(true)}
+                onMouseLeave={() => setZoomed(false)}
+                onMouseMove={handleMouseMove}
+                onClick={() => setZoomed(!zoomed)}
+              >
+                {/* Shimmer placeholder while loading */}
+                {!imgLoaded && (
+                  <div className="absolute inset-0 z-10 bg-gradient-to-r from-[var(--color-cream)] via-[var(--color-cream-dark)] to-[var(--color-cream)] bg-[length:200%_100%] animate-[shimmer_1.5s_infinite]" />
+                )}
+
+                <img
+                  src={optimizedImageUrl}
+                  alt={product.product_name}
+                  className={`w-full aspect-square object-contain p-2 transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  onLoad={() => setImgLoaded(true)}
+                  onError={(e) => {
+                    e.target.src = 'https://placehold.co/600x600/E8F0E0/2D5016?text=Tram+Huong';
+                    setImgLoaded(true);
+                  }}
+                  draggable={false}
+                  style={
+                    zoomed && imgLoaded
+                      ? { transform: 'scale(2)', transformOrigin: `${lensPos.x}% ${lensPos.y}%`, transition: 'transform 0.15s ease-out' }
+                      : { transform: 'scale(1)', transition: 'transform 0.3s ease-out' }
+                  }
+                />
+
+                {/* Zoom hint icon */}
+                <div className={`absolute bottom-3 right-3 bg-white/80 backdrop-blur rounded-full p-2 text-[var(--color-primary)] shadow transition-opacity duration-300 pointer-events-none ${zoomed ? 'opacity-0' : 'opacity-70 group-hover:opacity-100'}`}>
+                  <FiZoomIn size={18} />
+                </div>
+              </div>
             </div>
 
             {/* Info */}
-            <div className="pt-4">
+            <div className="pt-0 lg:pt-4">
               <div className="text-xs text-[var(--color-gold-dark)] uppercase tracking-[2px] font-semibold mb-3">
                 {product.category?.category_name || 'Trầm Hương'}
               </div>
 
-              <h1 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              <h1 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4">
                 {product.product_name}
               </h1>
 
@@ -107,11 +155,11 @@ export default function ProductDetail() {
                 {product.product_status ? 'Còn hàng' : 'Hết hàng'}
               </div>
 
-              <div className="text-3xl font-bold text-[var(--color-primary)] mb-6">
+              <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-6">
                 {formatPrice(product.product_price)}
               </div>
 
-              <p className="text-gray-500 leading-relaxed mb-8">
+              <p className="text-sm sm:text-base text-gray-500 leading-relaxed mb-8">
                 Sản phẩm trầm hương thiên nhiên cao cấp, được tuyển chọn kỹ lưỡng
                 từ những vùng nguyên liệu tốt nhất. Chế tác tỉ mỉ bởi nghệ nhân
                 lành nghề, mang đến hương thơm thanh tịnh và bền lâu.
@@ -144,7 +192,7 @@ export default function ProductDetail() {
                 <button
                   id="add-to-cart"
                   onClick={handleAddToCart}
-                  className={`flex-1 inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-md font-semibold text-sm uppercase tracking-wide transition-all duration-300 ${
+                  className={`flex-1 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 rounded-md font-semibold text-sm uppercase tracking-wide transition-all duration-300 ${
                     addedToCart
                       ? 'bg-[var(--color-primary)] text-white'
                       : 'bg-[var(--color-primary)] text-white border-2 border-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] hover:-translate-y-0.5 hover:shadow-lg'
