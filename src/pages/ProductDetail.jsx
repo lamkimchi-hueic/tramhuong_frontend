@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { productAPI, resolveImageUrl } from '../services/api';
 import { useCart } from '../context/CartContext';
-import { FiHome, FiChevronRight, FiShoppingBag, FiHeart, FiMinus, FiPlus, FiCheckCircle, FiZoomIn } from 'react-icons/fi';
+import { FiHome, FiChevronRight, FiShoppingBag, FiHeart, FiMinus, FiPlus, FiCheckCircle, FiZoomIn, FiPackage } from 'react-icons/fi';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -17,11 +17,24 @@ export default function ProductDetail() {
   const imgContainerRef = useRef(null);
   const { addToCart } = useCart();
 
+  // ===== State biến thể =====
+  // selectedVariant lưu biến thể đang được chọn (object { id_variant, size, price, stock })
+  // Nếu sản phẩm không có biến thể → selectedVariant = null
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
   useEffect(() => {
     setLoading(true);
     setImgLoaded(false);
+    setSelectedVariant(null); // Reset biến thể khi chuyển sản phẩm
+    setQuantity(1);
     productAPI.getById(id)
-      .then((res) => setProduct(res.data))
+      .then((res) => {
+        setProduct(res.data);
+        // Tự động chọn biến thể đầu tiên nếu sản phẩm có biến thể
+        if (res.data.variants && res.data.variants.length > 0) {
+          setSelectedVariant(res.data.variants[0]);
+        }
+      })
       .catch((err) => console.error('Lỗi:', err))
       .finally(() => setLoading(false));
   }, [id]);
@@ -29,9 +42,16 @@ export default function ProductDetail() {
   const formatPrice = (price) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 
+  // ===== Giá hiển thị: ưu tiên giá biến thể nếu đang chọn =====
+  const displayPrice = selectedVariant ? selectedVariant.price : product?.product_price;
+
+  // ===== Tồn kho biến thể đang chọn =====
+  const currentStock = selectedVariant ? selectedVariant.stock : null;
+
   const handleAddToCart = () => {
     if (product) {
-      addToCart(product, quantity);
+      // Truyền thêm selectedVariant vào addToCart
+      addToCart(product, quantity, selectedVariant);
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 2000);
     }
@@ -77,6 +97,8 @@ export default function ProductDetail() {
       </main>
     );
   }
+
+  const hasVariants = product.variants && product.variants.length > 0;
 
   return (
     <main id="product-detail-page">
@@ -155,9 +177,63 @@ export default function ProductDetail() {
                 {product.product_status ? 'Còn hàng' : 'Hết hàng'}
               </div>
 
+              {/* ===== GIÁ HIỂN THỊ ===== */}
               <div className="text-2xl sm:text-3xl font-bold text-[var(--color-primary)] mb-6">
-                {formatPrice(product.product_price)}
+                {formatPrice(displayPrice)}
               </div>
+
+              {/* ===== CHỌN BIẾN THỂ (SIZE) ===== */}
+              {hasVariants && (
+                <div className="mb-8">
+                  <label className="text-sm font-semibold text-gray-700 mb-3 block">
+                    Chọn phân loại:
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {product.variants.map((variant) => {
+                      const isSelected = selectedVariant?.id_variant === variant.id_variant;
+                      const isOutOfStock = variant.stock <= 0;
+                      return (
+                        <button
+                          key={variant.id_variant}
+                          onClick={() => {
+                            if (!isOutOfStock) {
+                              setSelectedVariant(variant);
+                              setQuantity(1); // Reset số lượng khi đổi biến thể
+                            }
+                          }}
+                          disabled={isOutOfStock}
+                          className={`
+                            relative px-4 py-2.5 rounded-lg border-2 text-sm font-semibold transition-all duration-200
+                            ${isSelected
+                              ? 'border-[var(--color-primary)] bg-[var(--color-primary-50)] text-[var(--color-primary)] shadow-sm'
+                              : isOutOfStock
+                                ? 'border-gray-200 bg-gray-50 text-gray-300 cursor-not-allowed line-through'
+                                : 'border-gray-200 bg-white text-gray-600 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary-50)]/30'
+                            }
+                          `}
+                        >
+                          {variant.size}
+                          {isSelected && (
+                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-[var(--color-primary)] rounded-full flex items-center justify-center">
+                              <FiCheckCircle size={10} className="text-white" />
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Hiển thị giá & tồn kho của biến thể đang chọn */}
+                  {selectedVariant && (
+                    <div className="mt-3 flex items-center gap-4 text-sm">
+                      <span className="flex items-center gap-1.5 text-gray-500">
+                        <FiPackage size={14} />
+                        Tồn kho: <strong className={currentStock > 0 ? 'text-[var(--color-primary)]' : 'text-red-500'}>{currentStock}</strong>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <p className="text-sm sm:text-base text-gray-500 leading-relaxed mb-8">
                 Sản phẩm trầm hương thiên nhiên cao cấp, được tuyển chọn kỹ lưỡng
@@ -179,12 +255,20 @@ export default function ProductDetail() {
                   <span className="px-6 py-2.5 font-semibold min-w-[50px] text-center">{quantity}</span>
                   <button
                     id="qty-plus"
-                    onClick={() => setQuantity(quantity + 1)}
+                    onClick={() => {
+                      // Nếu có biến thể → giới hạn số lượng theo tồn kho
+                      const maxQty = currentStock !== null ? currentStock : Infinity;
+                      setQuantity(Math.min(quantity + 1, maxQty));
+                    }}
                     className="px-4 py-2.5 bg-[var(--color-primary-50)] text-[var(--color-primary)] font-semibold hover:bg-[var(--color-primary-100)] transition-colors"
                   >
                     <FiPlus size={14} />
                   </button>
                 </div>
+                {/* Cảnh báo nếu đã chọn tối đa tồn kho */}
+                {currentStock !== null && quantity >= currentStock && currentStock > 0 && (
+                  <span className="text-xs text-amber-600 font-medium">Tối đa {currentStock} sản phẩm</span>
+                )}
               </div>
 
               {/* Actions */}
@@ -192,14 +276,19 @@ export default function ProductDetail() {
                 <button
                   id="add-to-cart"
                   onClick={handleAddToCart}
+                  disabled={hasVariants && (!selectedVariant || currentStock <= 0)}
                   className={`flex-1 inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 rounded-md font-semibold text-sm uppercase tracking-wide transition-all duration-300 ${
                     addedToCart
                       ? 'bg-[var(--color-primary)] text-white'
-                      : 'bg-[var(--color-primary)] text-white border-2 border-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] hover:-translate-y-0.5 hover:shadow-lg'
+                      : hasVariants && (!selectedVariant || currentStock <= 0)
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-[var(--color-primary)] text-white border-2 border-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] hover:-translate-y-0.5 hover:shadow-lg'
                   }`}
                 >
                   {addedToCart ? (
                     <><FiCheckCircle size={16} /> Đã Thêm!</>
+                  ) : hasVariants && !selectedVariant ? (
+                    <>Vui lòng chọn phân loại</>
                   ) : (
                     <><FiShoppingBag size={16} /> Thêm Vào Giỏ Hàng</>
                   )}

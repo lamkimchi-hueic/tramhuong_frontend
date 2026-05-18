@@ -3,6 +3,7 @@
 // Hiển thị ảnh, tên, danh mục, giá sản phẩm trong dạng card.
 // Sử dụng trên trang chủ (Sản Phẩm Nổi Bật) và trang danh sách sản phẩm.
 // Có hiệu ứng hover: phóng to ảnh, hiện nút yêu thích & thêm giỏ hàng.
+// Hỗ trợ hiển thị khoảng giá nếu sản phẩm có biến thể (variants).
 // ==================================================================
 
 import { useState } from 'react';
@@ -21,6 +22,25 @@ export default function ProductCard({ product }) {
       currency: 'VND',
     }).format(price);
   };
+
+  // ===== Tính giá hiển thị dựa trên biến thể =====
+  const hasVariants = product.variants && product.variants.length > 0;
+  let priceDisplay;
+
+  if (hasVariants) {
+    const prices = product.variants.map(v => v.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    if (minPrice === maxPrice) {
+      // Tất cả biến thể cùng giá → hiện 1 giá
+      priceDisplay = formatPrice(minPrice);
+    } else {
+      // Có nhiều mức giá → hiện khoảng giá
+      priceDisplay = `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+    }
+  } else {
+    priceDisplay = formatPrice(product.product_price);
+  }
 
   return (
     <div
@@ -48,12 +68,18 @@ export default function ProductCard({ product }) {
               Còn hàng
             </span>
           )}
+          {/* Badge số lượng biến thể ở góc trên phải */}
+          {hasVariants && (
+            <span className="absolute top-3 right-3 px-2 py-1 bg-white/90 backdrop-blur-sm text-[var(--color-primary)] text-[0.65rem] font-bold rounded-md shadow-sm">
+              {product.variants.length} phân loại
+            </span>
+          )}
         </div>
       </Link>
 
       {/* ===== NÚT HÀNH ĐỘNG NHANH (hiện khi hover) ===== */}
       {/* Nằm góc trên phải, trượt ra từ phải sang trái khi hover */}
-      <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+      <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style={hasVariants ? { top: '3.5rem' } : {}}>
         {/* Nút yêu thích (trái tim) */}
         <button
           onClick={() => setLiked(!liked)}
@@ -65,12 +91,13 @@ export default function ProductCard({ product }) {
           <FiHeart size={15} fill={liked ? 'white' : 'none'} />
         </button>
         {/* Nút thêm vào giỏ hàng */}
-        <button
+        <Link
+          to={`/products/${product.id_product}`}
           className="w-9 h-9 rounded-full bg-white text-gray-600 flex items-center justify-center shadow-md hover:bg-[var(--color-primary)] hover:text-white transition-colors duration-200"
-          aria-label="Thêm vào giỏ"
+          aria-label="Xem chi tiết"
         >
           <FiShoppingBag size={15} />
-        </button>
+        </Link>
       </div>
 
       {/* ===== PHẦN THÔNG TIN SẢN PHẨM ===== */}
@@ -85,9 +112,9 @@ export default function ProductCard({ product }) {
             {product.product_name}
           </h3>
         </Link>
-        {/* Giá sản phẩm (đã format VNĐ) */}
-        <div className="text-lg font-bold text-[var(--color-primary)]">
-          {formatPrice(product.product_price)}
+        {/* Giá sản phẩm (hiển thị khoảng giá nếu có biến thể) */}
+        <div className={`font-bold text-[var(--color-primary)] ${hasVariants ? 'text-sm' : 'text-lg'}`}>
+          {priceDisplay}
         </div>
       </div>
     </div>

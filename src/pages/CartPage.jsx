@@ -6,7 +6,7 @@ import { FiTrash2, FiMinus, FiPlus, FiShoppingBag, FiArrowLeft, FiCheckCircle, F
 import { useState, useEffect } from 'react';
 
 export default function CartPage() {
-  const { cartItems, removeFromCart, updateQuantity, totalAmount, clearCart } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, totalAmount, clearCart, getCartItemKey } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -52,7 +52,8 @@ export default function CartPage() {
         items: cartItems.map((item) => ({
           id_product: item.id_product,
           quantity: item.quantity,
-          price: item.product_price,
+          // Sử dụng cart_price (giá biến thể) nếu có, ngược lại dùng giá gốc
+          price: item.cart_price || item.product_price,
         })),
       };
 
@@ -112,51 +113,67 @@ export default function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             {/* List */}
             <div className="lg:col-span-2 space-y-4">
-              {cartItems.map((item) => (
-                <div key={item.id_product} className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 animate-fade-in">
-                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                    <img
-                      src={item.image_url
-                        ? resolveImageUrl(item.image_url)
-                        : `https://placehold.co/200x200/E8F0E0/2D5016?text=Tram+Huong`
-                      }
-                      alt={item.product_name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => { e.target.src = 'https://placehold.co/200x200/E8F0E0/2D5016?text=Tram+Huong'; }}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-gray-800 truncate">{item.product_name}</h3>
-                    <p className="text-[var(--color-primary)] font-semibold text-sm">
-                      {formatPrice(item.product_price)}
-                    </p>
-                  </div>
-                  <div className="flex items-center border border-gray-200 rounded-lg">
+              {cartItems.map((item) => {
+                const cartKey = getCartItemKey(item);
+                const itemPrice = item.cart_price || item.product_price;
+                return (
+                  <div key={cartKey} className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 animate-fade-in">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                      <img
+                        src={item.image_url
+                          ? resolveImageUrl(item.image_url)
+                          : `https://placehold.co/200x200/E8F0E0/2D5016?text=Tram+Huong`
+                        }
+                        alt={item.product_name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.target.src = 'https://placehold.co/200x200/E8F0E0/2D5016?text=Tram+Huong'; }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-gray-800 truncate">{item.product_name}</h3>
+                      {/* Hiển thị biến thể đang chọn (nếu có) */}
+                      {item.selectedVariant && (
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-[var(--color-primary-50)] text-[var(--color-primary)] text-xs font-semibold rounded">
+                          {item.selectedVariant.size}
+                        </span>
+                      )}
+                      <p className="text-[var(--color-primary)] font-semibold text-sm mt-1">
+                        {formatPrice(itemPrice)}
+                      </p>
+                    </div>
+                    <div className="flex items-center border border-gray-200 rounded-lg">
+                      <button
+                        onClick={() => updateQuantity(cartKey, item.quantity - 1)}
+                        className="p-2 hover:bg-gray-50 text-gray-500"
+                      >
+                        <FiMinus size={14} />
+                      </button>
+                      <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
+                      <button
+                        onClick={() => {
+                          // Giới hạn theo tồn kho biến thể (nếu có)
+                          const maxQty = item.selectedVariant ? item.selectedVariant.stock : Infinity;
+                          if (item.quantity < maxQty) {
+                            updateQuantity(cartKey, item.quantity + 1);
+                          }
+                        }}
+                        className="p-2 hover:bg-gray-50 text-gray-500"
+                      >
+                        <FiPlus size={14} />
+                      </button>
+                    </div>
+                    <div className="text-right hidden sm:block min-w-[100px]">
+                      <p className="font-bold text-gray-800">{formatPrice(itemPrice * item.quantity)}</p>
+                    </div>
                     <button
-                      onClick={() => updateQuantity(item.id_product, item.quantity - 1)}
-                      className="p-2 hover:bg-gray-50 text-gray-500"
+                      onClick={() => removeFromCart(cartKey)}
+                      className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all rounded-lg"
                     >
-                      <FiMinus size={14} />
-                    </button>
-                    <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id_product, item.quantity + 1)}
-                      className="p-2 hover:bg-gray-50 text-gray-500"
-                    >
-                      <FiPlus size={14} />
+                      <FiTrash2 size={18} />
                     </button>
                   </div>
-                  <div className="text-right hidden sm:block min-w-[100px]">
-                    <p className="font-bold text-gray-800">{formatPrice(item.product_price * item.quantity)}</p>
-                  </div>
-                  <button
-                    onClick={() => removeFromCart(item.id_product)}
-                    className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all rounded-lg"
-                  >
-                    <FiTrash2 size={18} />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
               
               <div className="pt-4">
                 <Link to="/products" className="text-sm font-semibold text-[var(--color-primary)] flex items-center gap-2 hover:underline">

@@ -3,12 +3,22 @@
 // Lưu trữ danh sách sản phẩm trong giỏ hàng vào localStorage để
 // dữ liệu không bị mất khi reload trang.
 // Cung cấp các hàm: thêm, xóa, cập nhật số lượng, xóa toàn bộ giỏ hàng.
+// Hỗ trợ biến thể sản phẩm (ProductVariant): cùng 1 sản phẩm nhưng khác size
+// sẽ được lưu thành các dòng riêng biệt trong giỏ hàng.
 // ==================================================================
 
 import { createContext, useContext, useState, useEffect } from 'react';
 
 // Tạo Context object cho giỏ hàng
 const CartContext = createContext();
+
+// ===== Hàm tạo key duy nhất cho mỗi dòng trong giỏ =====
+// Nếu item có biến thể → key = "productId-variantId", ngược lại chỉ dùng productId.
+// Điều này cho phép cùng 1 sản phẩm nhưng khác size nằm trên các dòng riêng biệt.
+const getCartItemKey = (item) => {
+  if (item.selectedVariant) return `${item.id_product}-${item.selectedVariant.id_variant}`;
+  return `${item.id_product}`;
+};
 
 // ==================== CART PROVIDER ====================
 // Component bọc (wrapper) cung cấp trạng thái giỏ hàng cho toàn bộ ứng dụng.
@@ -29,38 +39,47 @@ export function CartProvider({ children }) {
   }, [cartItems]); // Dependency: cartItems → chạy lại khi giỏ hàng thay đổi
 
   // ===== Thêm sản phẩm vào giỏ hàng =====
-  // Nếu sản phẩm đã tồn tại trong giỏ → cộng thêm số lượng.
-  // Nếu chưa tồn tại → thêm mới vào cuối mảng.
-  const addToCart = (product, quantity) => {
+  // Hỗ trợ biến thể: nếu có selectedVariant, sẽ dùng giá và thông tin biến thể.
+  // Cùng 1 sản phẩm nhưng khác biến thể sẽ nằm ở các dòng khác nhau.
+  const addToCart = (product, quantity, selectedVariant = null) => {
     setCartItems((prevItems) => {
-      // Kiểm tra sản phẩm đã có trong giỏ chưa (so sánh theo id_product)
-      const existingItem = prevItems.find((item) => item.id_product === product.id_product);
-      if (existingItem) {
+      const newItem = {
+        ...product,
+        selectedVariant,
+        // Nếu có biến thể → dùng giá biến thể, ngược lại dùng giá gốc sản phẩm
+        cart_price: selectedVariant ? selectedVariant.price : product.product_price,
+      };
+      const newKey = getCartItemKey(newItem);
+
+      // Tìm item đã tồn tại trong giỏ (so sánh theo key = product + variant)
+      const existingIndex = prevItems.findIndex((item) => getCartItemKey(item) === newKey);
+
+      if (existingIndex >= 0) {
         // Đã tồn tại → cập nhật số lượng (cộng thêm quantity mới)
-        return prevItems.map((item) =>
-          item.id_product === product.id_product
-            ? { ...item, quantity: item.quantity + quantity } // Cộng thêm số lượng
-            : item // Giữ nguyên các sản phẩm khác
+        return prevItems.map((item, idx) =>
+          idx === existingIndex
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
         );
       }
       // Chưa tồn tại → thêm sản phẩm mới kèm số lượng vào cuối mảng
-      return [...prevItems, { ...product, quantity }];
+      return [...prevItems, { ...newItem, quantity }];
     });
   };
 
   // ===== Xóa sản phẩm khỏi giỏ hàng =====
-  // Lọc bỏ sản phẩm có id_product trùng khớp
-  const removeFromCart = (productId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id_product !== productId));
+  // Sử dụng cartKey (product + variant) để xác định chính xác dòng cần xóa
+  const removeFromCart = (cartKey) => {
+    setCartItems((prevItems) => prevItems.filter((item) => getCartItemKey(item) !== cartKey));
   };
 
   // ===== Cập nhật số lượng sản phẩm =====
   // Không cho phép số lượng < 1 (tối thiểu là 1)
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = (cartKey, quantity) => {
     if (quantity < 1) return; // Bảo vệ: không cho số lượng < 1
     setCartItems((prevItems) =>
       prevItems.map((item) =>
-        item.id_product === productId ? { ...item, quantity } : item
+        getCartItemKey(item) === cartKey ? { ...item, quantity } : item
       )
     );
   };
@@ -72,9 +91,9 @@ export function CartProvider({ children }) {
   };
 
   // ===== Tính tổng tiền giỏ hàng =====
-  // Cộng dồn (giá × số lượng) của tất cả sản phẩm trong giỏ
+  // Ưu tiên dùng cart_price (giá biến thể) nếu có, ngược lại dùng product_price
   const totalAmount = cartItems.reduce(
-    (sum, item) => sum + item.product_price * item.quantity,
+    (sum, item) => sum + (item.cart_price || item.product_price) * item.quantity,
     0 // Giá trị khởi tạo = 0
   );
 
@@ -87,12 +106,13 @@ export function CartProvider({ children }) {
     <CartContext.Provider
       value={{
         cartItems,      // Mảng các sản phẩm trong giỏ
-        addToCart,       // Hàm thêm sản phẩm
-        removeFromCart,  // Hàm xóa sản phẩm
-        updateQuantity,  // Hàm cập nhật số lượng
+        addToCart,       // Hàm thêm sản phẩm (hỗ trợ biến thể)
+        removeFromCart,  // Hàm xóa sản phẩm (theo cartKey)
+        updateQuantity,  // Hàm cập nhật số lượng (theo cartKey)
         clearCart,       // Hàm xóa toàn bộ giỏ
         totalAmount,     // Tổng tiền
         itemCount,       // Tổng số lượng sản phẩm
+        getCartItemKey,  // Hàm tạo key cho cart item (export để dùng ở CartPage)
       }}
     >
       {children}
