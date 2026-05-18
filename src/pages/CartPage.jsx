@@ -51,6 +51,7 @@ export default function CartPage() {
         shipping_phone: shippingInfo.phone,
         items: cartItems.map((item) => ({
           id_product: item.id_product,
+          id_variant: item.selectedVariant?.id_variant || null,
           quantity: item.quantity,
           // Sử dụng cart_price (giá biến thể) nếu có, ngược lại dùng giá gốc
           price: item.cart_price || item.product_price,
