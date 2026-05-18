@@ -17,7 +17,7 @@ export default function HomePage() {
     const fetchProducts = async () => {
       try {
         const res = await productAPI.getAll();
-        setFeaturedProducts(res.data.slice(0, 8));
+        setFeaturedProducts(res.data.slice(0, 8));//lấy 8 sp đầu tiên
       } catch (err) {
         console.error('Lỗi khi tải sản phẩm:', err);
       } finally {

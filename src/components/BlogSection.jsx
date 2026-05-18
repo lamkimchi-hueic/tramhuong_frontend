@@ -12,7 +12,7 @@ const features = [
 
 export default function BlogSection() {
   const [activeFeature, setActiveFeature] = useState(null);
-  const { ref: sectionRef, isVisible } = useScrollReveal({ threshold: 0.15 });
+  const { ref: sectionRef, isVisible } = useScrollReveal({ threshold: 0.15 });//anima
 
   return (
     <section id="blog-section" className="py-24 bg-white" ref={sectionRef}>
