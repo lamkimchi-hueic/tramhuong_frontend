@@ -59,27 +59,52 @@ export default function AdminAnalytics() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Helper: fetch an endpoint safely, return null on failure
+    const safeFetch = async (endpoint) => {
+      try {
+        const baseUrl = AI_URL.replace(/\/+$/, ''); // Loại bỏ trailing slash để tránh double-slash
+        const res = await fetch(`${baseUrl}/analysis/${endpoint}`);
+        if (!res.ok) {
+          console.warn(`AI endpoint /analysis/${endpoint} returned ${res.status}`);
+          return null;
+        }
+        return await res.json();
+      } catch (err) {
+        console.warn(`AI endpoint /analysis/${endpoint} failed:`, err);
+        return null;
+      }
+    };
+
     const fetchAll = async () => {
       setLoading(true);
       setError(null);
       try {
-        const endpoints = [
-          'overview', 'revenue-trend', 'top-products',
-          'category-share', 'order-status', 'customer-insights', 'forecast'
-        ];
-        const results = await Promise.all(
-          endpoints.map(ep => fetch(`${AI_URL}/analysis/${ep}`).then(r => r.json()))
-        );
-        setOverview(results[0]);
-        setRevenueTrend(results[1]);
-        setTopProducts(results[2]);
-        setCategoryShare(results[3]);
-        setOrderStatus(results[4]);
-        setCustomers(results[5]);
-        setForecast(results[6]);
+        const [ov, rt, tp, cs, os, ci, fc] = await Promise.all([
+          safeFetch('overview'),
+          safeFetch('revenue-trend'),
+          safeFetch('top-products'),
+          safeFetch('category-share'),
+          safeFetch('order-status'),
+          safeFetch('customer-insights'),
+          safeFetch('forecast'),
+        ]);
+
+        // Kiểm tra tất cả đều null → service không hoạt động
+        if ([ov, rt, tp, cs, os, ci, fc].every(v => v === null)) {
+          setError('Không thể kết nối đến dịch vụ phân tích. Hãy chắc chắn AI server đang chạy.');
+          return;
+        }
+
+        setOverview(ov);
+        setRevenueTrend(rt);
+        setTopProducts(Array.isArray(tp) ? tp : []);        // Đảm bảo luôn là mảng
+        setCategoryShare(Array.isArray(cs) ? cs : []);       // Đảm bảo luôn là mảng
+        setOrderStatus(Array.isArray(os) ? os : []);         // Đảm bảo luôn là mảng
+        setCustomers(ci);
+        setForecast(fc);
       } catch (err) {
         console.error('AI Analysis fetch error:', err);
-        setError('Không thể kết nối đến dịch vụ phân tích. Hãy chắc chắn AI server đang chạy trên cổng 8000.');
+        setError('Không thể kết nối đến dịch vụ phân tích. Hãy chắc chắn AI server đang chạy.');
       } finally {
         setLoading(false);
       }
