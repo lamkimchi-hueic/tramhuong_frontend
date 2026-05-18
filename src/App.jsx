@@ -28,6 +28,7 @@ import AdminProducts from './pages/admin/AdminProducts';   // Trang quản lý s
 import AdminCategories from './pages/admin/AdminCategories'; // Trang quản lý danh mục
 import AdminOrders from './pages/admin/AdminOrders';       // Trang quản lý đơn hàng
 import AdminSettings from './pages/admin/AdminSettings';   // Trang cài đặt hệ thống
+import AdminAnalytics from './pages/admin/AdminAnalytics'; // Trang phân tích dữ liệu AI
 
 import { CartProvider } from './context/CartContext'; // Provider giỏ hàng
 import './App.css'; // CSS riêng của App (minimal)
@@ -80,6 +81,7 @@ function App() {
               <Route path="categories" element={<AdminCategories />} /> {/* /admin/categories → Quản lý danh mục */}
               <Route path="orders" element={<AdminOrders />} />         {/* /admin/orders → Quản lý đơn hàng */}
               <Route path="settings" element={<AdminSettings />} />     {/* /admin/settings → Cài đặt hệ thống */}
+              <Route path="analytics" element={<AdminAnalytics />} />   {/* /admin/analytics → Phân tích dữ liệu AI */}
             </Route>
           </Routes>
         </Router>

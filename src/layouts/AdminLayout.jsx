@@ -7,7 +7,7 @@
 
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom'; // Routing tools
 import { useAuth } from '../context/AuthContext';                           // Hook lấy thông tin user đăng nhập
-import { FiHome, FiUsers, FiBox, FiList, FiShoppingCart, FiLogOut, FiMenu, FiX, FiPieChart, FiSettings } from 'react-icons/fi'; // Icons
+import { FiHome, FiUsers, FiBox, FiList, FiShoppingCart, FiLogOut, FiMenu, FiX, FiPieChart, FiSettings, FiActivity } from 'react-icons/fi'; // Icons
 import { useState, useEffect } from 'react';
 
 export default function AdminLayout() {
@@ -53,6 +53,7 @@ export default function AdminLayout() {
     { path: '/admin/orders', name: 'Đơn hàng', icon: FiShoppingCart }, // Quản lý đơn hàng
     { path: '/admin/products', name: 'Sản phẩm', icon: FiBox },      // Quản lý sản phẩm
     { path: '/admin/categories', name: 'Danh mục', icon: FiList },    // Quản lý danh mục
+    { path: '/admin/analytics', name: 'Phân tích (AI)', icon: FiActivity }, // Phân tích dữ liệu AI
   ];
 
   // Chỉ Admin mới thấy menu "Người dùng" và "Cài đặt" (Employee không có quyền)
