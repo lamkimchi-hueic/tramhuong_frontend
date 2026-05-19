@@ -22,6 +22,15 @@ export default function TestimonialSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
   const { ref: sectionRef, isVisible } = useScrollReveal({ threshold: 0.1 });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Lắng nghe kích thước màn hình để tối ưu hóa render DOM trên mobile
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fetch testimonials từ SiteSettings
   useEffect(() => {
@@ -67,57 +76,60 @@ export default function TestimonialSection() {
           Những chia sẻ chân thực từ khách hàng đã tin tưởng và sử dụng sản phẩm
         </p>
 
-        {/* Desktop Grid */}
-        <div className="hidden md:grid grid-cols-3 gap-6">
-          {testimonials.map((t, idx) => (
-            <div key={t.id} id={`testimonial-${t.id}`}
-              className={`bg-white rounded-xl p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-lg ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-              style={{ transitionDelay: isVisible ? `${300 + idx * 150}ms` : '0ms' }}
-            >
+        {/* Desktop/Mobile Conditional Rendering */}
+        {!isMobile ? (
+          /* Desktop Grid */
+          <div className="grid grid-cols-3 gap-6">
+            {testimonials.map((t, idx) => (
+              <div key={t.id} id={`testimonial-${t.id}`}
+                className={`bg-white rounded-xl p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-lg ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                style={{ transitionDelay: isVisible ? `${300 + idx * 150}ms` : '0ms' }}
+              >
+                <div className="font-[family-name:var(--font-heading)] text-4xl text-[var(--color-primary-100)] mb-4">"</div>
+                <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">{t.text}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{getInitials(t.name)}</div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-800">{t.name}</h4>
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: t.rating }, (_, i) => (
+                        <FiStar key={i} size={13} fill="#C4A35A" stroke="#C4A35A" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* Mobile Carousel */
+          <div>
+            <div className={`bg-white rounded-xl p-8 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
               <div className="font-[family-name:var(--font-heading)] text-4xl text-[var(--color-primary-100)] mb-4">"</div>
-              <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">{t.text}</p>
+              <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">{testimonials[currentSlide]?.text}</p>
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{getInitials(t.name)}</div>
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{getInitials(testimonials[currentSlide]?.name)}</div>
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-800">{t.name}</h4>
+                  <h4 className="text-sm font-semibold text-gray-800">{testimonials[currentSlide]?.name}</h4>
                   <div className="flex gap-0.5">
-                    {Array.from({ length: t.rating }, (_, i) => (
+                    {Array.from({ length: testimonials[currentSlide]?.rating || 5 }, (_, i) => (
                       <FiStar key={i} size={13} fill="#C4A35A" stroke="#C4A35A" />
                     ))}
                   </div>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Mobile Carousel */}
-        <div className="md:hidden">
-          <div className={`bg-white rounded-xl p-8 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
-            <div className="font-[family-name:var(--font-heading)] text-4xl text-[var(--color-primary-100)] mb-4">"</div>
-            <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">{testimonials[currentSlide]?.text}</p>
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{getInitials(testimonials[currentSlide]?.name)}</div>
-              <div>
-                <h4 className="text-sm font-semibold text-gray-800">{testimonials[currentSlide]?.name}</h4>
-                <div className="flex gap-0.5">
-                  {Array.from({ length: testimonials[currentSlide]?.rating || 5 }, (_, i) => (
-                    <FiStar key={i} size={13} fill="#C4A35A" stroke="#C4A35A" />
-                  ))}
-                </div>
+            <div className="flex items-center justify-center gap-4 mt-6">
+              <button onClick={prevSlide} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"><FiChevronLeft size={18} /></button>
+              <div className="flex gap-2">
+                {testimonials.map((_, idx) => (
+                  <button key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentSlide ? 'bg-[var(--color-primary)] w-6' : 'bg-gray-300'}`} />
+                ))}
               </div>
+              <button onClick={nextSlide} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"><FiChevronRight size={18} /></button>
             </div>
           </div>
-          <div className="flex items-center justify-center gap-4 mt-6">
-            <button onClick={prevSlide} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"><FiChevronLeft size={18} /></button>
-            <div className="flex gap-2">
-              {testimonials.map((_, idx) => (
-                <button key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentSlide ? 'bg-[var(--color-primary)] w-6' : 'bg-gray-300'}`} />
-              ))}
-            </div>
-            <button onClick={nextSlide} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors"><FiChevronRight size={18} /></button>
-          </div>
-        </div>
+        )}
       </div>
     </section>
   );

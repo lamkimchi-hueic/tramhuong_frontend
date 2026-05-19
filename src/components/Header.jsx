@@ -176,7 +176,6 @@ export default function Header() {
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 relative z-10 ${
                 searchOpen ? 'text-[var(--color-primary)]' : 'text-[#2D5016]'
               } hover:bg-[var(--color-primary)]/10`}
-              aria-label="Tìm kiếm"
             >
               {searchOpen ? <FiX size={18} /> : <FiSearch size={18} />}
             </button>
@@ -208,7 +207,6 @@ export default function Header() {
                 id="user-menu-btn"
                 onClick={() => setUserMenuOpen(!userMenuOpen)} // Toggle mở/đóng dropdown
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:bg-[var(--color-primary)]/10 text-[#2D5016]`}
-                aria-label="Tài khoản"
               >
                 <FiUser size={18} />
               </button>
@@ -263,7 +261,6 @@ export default function Header() {
           onClick={() => setMenuOpen(!menuOpen)} // Toggle mở/đóng menu mobile
           className={`md:hidden text-xl text-[#2D5016]`}
           style={{ zIndex: 10000001, position: 'relative' }}
-          aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'}
         >
           {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
@@ -289,31 +286,33 @@ export default function Header() {
           transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
         }}
       >
-        <nav className="flex flex-col gap-1 pt-24 px-6">
-          {/* Render danh sách link điều hướng */}
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={`py-3 px-4 text-lg font-medium rounded-lg transition-colors ${
-                location.pathname === link.to
-                  ? 'bg-[var(--color-primary-50)] text-[var(--color-primary)]' // Link active
-                  : 'text-gray-700 hover:bg-gray-50'                            // Link bình thường
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-          {/* Nút đăng nhập (chỉ hiện khi chưa đăng nhập) */}
-          {!user && (
-            <Link
-              to="/login"
-              className="mt-4 py-3 bg-[var(--color-primary)] text-white text-center rounded-lg font-semibold"
-            >
-              Đăng Nhập
-            </Link>
-          )}
-        </nav>
+        {menuOpen && (
+          <nav className="flex flex-col gap-1 pt-24 px-6">
+            {/* Render danh sách link điều hướng */}
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`py-3 px-4 text-lg font-medium rounded-lg transition-colors ${
+                  location.pathname === link.to
+                    ? 'bg-[var(--color-primary-50)] text-[var(--color-primary)]' // Link active
+                    : 'text-gray-700 hover:bg-gray-50'                            // Link bình thường
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            {/* Nút đăng nhập (chỉ hiện khi chưa đăng nhập) */}
+            {!user && (
+              <Link
+                to="/login"
+                className="mt-4 py-3 bg-[var(--color-primary)] text-white text-center rounded-lg font-semibold"
+              >
+                Đăng Nhập
+              </Link>
+            )}
+          </nav>
+        )}
       </div>
     </header>
   );
