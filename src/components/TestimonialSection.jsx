@@ -1,16 +1,57 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { settingAPI } from '../services/api';
 import useScrollReveal from '../hooks/useScrollReveal';
 
-const testimonials = [
-  { id: 1, text: 'Mình rất hài lòng với sản phẩm vòng tay trầm hương. Hương thơm dịu nhẹ, đeo rất thoải mái. Sẽ ủng hộ tiếp!', name: 'Nguyễn Minh Anh', initials: 'NA', rating: 5 },
-  { id: 2, text: 'Bộ quà tặng trầm hương rất sang trọng, đóng gói cẩn thận. Mình mua tặng đối tác kinh doanh, ai cũng khen.', name: 'Trần Văn Hùng', initials: 'TH', rating: 5 },
-  { id: 3, text: 'Trầm hương tự nhiên chất lượng tuyệt vời. Đốt lên hương thơm lan tỏa cả phòng, rất dễ chịu và thư giãn.', name: 'Lê Thu Hương', initials: 'LH', rating: 5 },
+// Testimonials mặc định — sẽ bị ghi đè nếu admin đã cấu hình qua settings
+const DEFAULT_TESTIMONIALS = [
+  { id: 1, text: 'Mình rất hài lòng với sản phẩm vòng tay trầm hương. Hương thơm dịu nhẹ, đeo rất thoải mái. Sẽ ủng hộ tiếp!', name: 'Nguyễn Minh Anh', rating: 5 },
+  { id: 2, text: 'Bộ quà tặng trầm hương rất sang trọng, đóng gói cẩn thận. Mình mua tặng đối tác kinh doanh, ai cũng khen.', name: 'Trần Văn Hùng', rating: 5 },
+  { id: 3, text: 'Trầm hương tự nhiên chất lượng tuyệt vời. Đốt lên hương thơm lan tỏa cả phòng, rất dễ chịu và thư giãn.', name: 'Lê Thu Hương', rating: 5 },
 ];
+
+// Tạo initials từ tên (VD: "Nguyễn Minh Anh" → "NA")
+function getInitials(name) {
+  if (!name) return '??';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0][0]?.toUpperCase() || '?';
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 export default function TestimonialSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
   const { ref: sectionRef, isVisible } = useScrollReveal({ threshold: 0.1 });
+
+  // Fetch testimonials từ SiteSettings
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await settingAPI.getAll();
+        const settings = res.data || {};
+
+        // Kiểm tra có testimonials trong settings không (key: testimonials_data — JSON string)
+        if (settings.testimonials_data) {
+          try {
+            const parsed = JSON.parse(settings.testimonials_data);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setTestimonials(parsed.map((t, idx) => ({
+                id: idx + 1,
+                text: t.text || '',
+                name: t.name || '',
+                rating: parseInt(t.rating) || 5,
+              })));
+            }
+          } catch (e) {
+            console.error('TestimonialSection: Lỗi parse testimonials_data:', e);
+          }
+        }
+      } catch (err) {
+        console.error('TestimonialSection: Lỗi khi tải settings:', err);
+      }
+    };
+    fetchData();
+  }, []);
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % testimonials.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length);
@@ -36,7 +77,7 @@ export default function TestimonialSection() {
               <div className="font-[family-name:var(--font-heading)] text-4xl text-[var(--color-primary-100)] mb-4">"</div>
               <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">{t.text}</p>
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{t.initials}</div>
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{getInitials(t.name)}</div>
                 <div>
                   <h4 className="text-sm font-semibold text-gray-800">{t.name}</h4>
                   <div className="flex gap-0.5">
@@ -54,13 +95,13 @@ export default function TestimonialSection() {
         <div className="md:hidden">
           <div className={`bg-white rounded-xl p-8 transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
             <div className="font-[family-name:var(--font-heading)] text-4xl text-[var(--color-primary-100)] mb-4">"</div>
-            <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">{testimonials[currentSlide].text}</p>
+            <p className="text-sm text-gray-500 leading-relaxed mb-6 italic">{testimonials[currentSlide]?.text}</p>
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{testimonials[currentSlide].initials}</div>
+              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary-50)] to-[var(--color-primary-100)] flex items-center justify-center font-bold text-[var(--color-primary)]">{getInitials(testimonials[currentSlide]?.name)}</div>
               <div>
-                <h4 className="text-sm font-semibold text-gray-800">{testimonials[currentSlide].name}</h4>
+                <h4 className="text-sm font-semibold text-gray-800">{testimonials[currentSlide]?.name}</h4>
                 <div className="flex gap-0.5">
-                  {Array.from({ length: testimonials[currentSlide].rating }, (_, i) => (
+                  {Array.from({ length: testimonials[currentSlide]?.rating || 5 }, (_, i) => (
                     <FiStar key={i} size={13} fill="#C4A35A" stroke="#C4A35A" />
                   ))}
                 </div>
