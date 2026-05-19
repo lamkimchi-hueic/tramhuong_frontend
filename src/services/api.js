@@ -142,8 +142,12 @@ export const settingAPI = {
   upsert: (data) => api.post('/settings', data),                          // Tạo mới hoặc cập nhật 1 cài đặt
   bulkUpsert: (settings) => api.put('/settings/bulk', { settings }),       // Cập nhật nhiều cài đặt cùng lúc
   uploadHeroImages: (formData) => {
-    // FormData - let axios automatically set Content-Type with boundary
-    return api.post('/settings/hero/upload', formData);
+    // Set Content-Type to undefined để axios auto-detect FormData boundary
+    return api.post('/settings/hero/upload', formData, {
+      headers: {
+        'Content-Type': undefined,
+      }
+    });
   },
   delete: (key) => api.delete(`/settings/${key}`),                        // Xóa 1 cài đặt
 };
