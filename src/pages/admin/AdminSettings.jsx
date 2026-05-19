@@ -95,45 +95,41 @@ export default function AdminSettings() {
             value: formData[f.key] || ''
           });
         });
+        await settingAPI.bulkUpsert(settingsToSave);
       } else if (activeTab === 'hero') {
-        // Lưu hero text fields
+        // Upload ảnh TRƯỚC (nếu có)
+        if (heroImageFile || logoFile) {
+          console.log('📤 Uploading images...');
+          const formDataImages = new FormData();
+          if (heroImageFile) {
+            console.log('  - Adding hero_image:', heroImageFile.name);
+            formDataImages.append('hero_image', heroImageFile);
+          }
+          if (logoFile) {
+            console.log('  - Adding logo_image:', logoFile.name);
+            formDataImages.append('logo_image', logoFile);
+          }
+          console.log('  - Sending to API...');
+          const uploadRes = await settingAPI.uploadHeroImages(formDataImages);
+          console.log('✓ Upload response:', uploadRes);
+          setHeroImageFile(null);
+          setLogoFile(null);
+        }
+
+        // Lưu hero text fields (không include image URLs vì đã upload rồi)
         HERO_FIELDS.forEach(f => {
           settingsToSave.push({
             key: f.key,
             value: formData[f.key] || ''
           });
         });
-
-        // Nếu có upload ảnh hero hoặc logo, gửi FormData
-        if (heroImageFile || logoFile) {
-          const formDataImages = new FormData();
-          if (heroImageFile) {
-            formDataImages.append('hero_image', heroImageFile);
-            settingsToSave.push({
-              key: 'hero_image_url',
-              value: 'pending_upload' // Placeholder
-            });
-          }
-          if (logoFile) {
-            formDataImages.append('logo_image', logoFile);
-            settingsToSave.push({
-              key: 'logo_url',
-              value: 'pending_upload'
-            });
-          }
-          
-          // Upload ảnh qua endpoint riêng (sẽ tạo)
-          await settingAPI.uploadHeroImages(formDataImages);
-          
-          setHeroImageFile(null);
-          setLogoFile(null);
-        }
+        await settingAPI.bulkUpsert(settingsToSave);
       }
 
-      await settingAPI.bulkUpsert(settingsToSave);
       setMessage('Lưu cài đặt thành công!');
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
+      console.error('❌ Error saving:', error);
       setMessage('Có lỗi xảy ra khi lưu: ' + (error.response?.data?.message || error.message));
     } finally {
       setSaving(false);
