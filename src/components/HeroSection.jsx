@@ -131,6 +131,8 @@ export default function HeroSection() {
               src={heroImage}
               alt="Trầm Hương cao cấp"
               className="w-full h-full object-cover img-ken-burns"
+              fetchPriority="high"
+              decoding="async"
               onError={(e) => { e.currentTarget.src = altImage; }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-primary)]/30 via-transparent to-transparent" />
