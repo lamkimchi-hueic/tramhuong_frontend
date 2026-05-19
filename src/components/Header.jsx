@@ -259,42 +259,59 @@ export default function Header() {
         <button
           id="hamburger-btn"
           onClick={() => setMenuOpen(!menuOpen)} // Toggle mở/đóng menu mobile
-          className={`md:hidden z-50 text-xl text-[#2D5016]`}
+          className={`md:hidden text-xl text-[#2D5016]`}
+          style={{ zIndex: 10000001, position: 'relative' }}
         >
           {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
       </div>
 
-      {/* ===== MOBILE MENU (toàn màn hình) ===== */}
-      {menuOpen && (
-        <div className="md:hidden fixed inset-0 top-0 bg-white z-40 pt-24 px-6 animate-fade-in-up">
-          <nav className="flex flex-col gap-1">
-            {/* Render danh sách link điều hướng */}
-            {navLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`py-3 px-4 text-lg font-medium rounded-lg transition-colors ${
-                  location.pathname === link.to
-                    ? 'bg-[var(--color-primary-50)] text-[var(--color-primary)]' // Link active
-                    : 'text-gray-700 hover:bg-gray-50'                            // Link bình thường
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {/* Nút đăng nhập (chỉ hiện khi chưa đăng nhập) */}
-            {!user && (
-              <Link
-                to="/login"
-                className="mt-4 py-3 bg-[var(--color-primary)] text-white text-center rounded-lg font-semibold"
-              >
-                Đăng Nhập
-              </Link>
-            )}
-          </nav>
-        </div>
-      )}
+      {/* ===== MOBILE MENU (slide-in từ trái) ===== */}
+      {/* Backdrop overlay — nhấn vào để đóng menu */}
+      <div
+        className={`md:hidden fixed inset-0 bg-black/40 transition-opacity duration-300 ${
+          menuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+        }`}
+        style={{ zIndex: 9999999 }}
+        onClick={() => setMenuOpen(false)}
+      />
+      {/* Menu panel — trượt vào từ bên trái */}
+      <div
+        className="md:hidden fixed top-0 left-0 h-screen transition-transform duration-300 ease-in-out"
+        style={{
+          backgroundColor: '#f5f0e8',
+          width: '80vw',
+          height: '100vh',
+          zIndex: 10000000,
+          transform: menuOpen ? 'translateX(0)' : 'translateX(-100%)',
+        }}
+      >
+        <nav className="flex flex-col gap-1 pt-24 px-6">
+          {/* Render danh sách link điều hướng */}
+          {navLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`py-3 px-4 text-lg font-medium rounded-lg transition-colors ${
+                location.pathname === link.to
+                  ? 'bg-[var(--color-primary-50)] text-[var(--color-primary)]' // Link active
+                  : 'text-gray-700 hover:bg-gray-50'                            // Link bình thường
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+          {/* Nút đăng nhập (chỉ hiện khi chưa đăng nhập) */}
+          {!user && (
+            <Link
+              to="/login"
+              className="mt-4 py-3 bg-[var(--color-primary)] text-white text-center rounded-lg font-semibold"
+            >
+              Đăng Nhập
+            </Link>
+          )}
+        </nav>
+      </div>
     </header>
   );
 }
