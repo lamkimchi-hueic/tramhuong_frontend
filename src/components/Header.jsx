@@ -10,6 +10,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'; // Routing ho
 import { FiSearch, FiUser, FiLogOut, FiMenu, FiX, FiPieChart, FiShoppingCart } from 'react-icons/fi'; // Icons
 import { useAuth } from '../context/AuthContext';   // Hook lấy thông tin đăng nhập
 import { useCart } from '../context/CartContext';     // Hook lấy số lượng giỏ hàng
+import { settingAPI, resolveImageUrl } from '../services/api'; // API để fetch settings
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);       // Theo dõi trang đã cuộn xuống chưa
@@ -17,10 +18,26 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false); // Trạng thái mở/đóng dropdown user
   const [searchOpen, setSearchOpen] = useState(false);   // Trạng thái mở/đóng ô tìm kiếm
   const [searchQuery, setSearchQuery] = useState('');    // Từ khóa tìm kiếm
+  const [logoUrl, setLogoUrl] = useState(null);          // Logo URL từ settings
   const { user, logout, loading } = useAuth();           // Thông tin user đăng nhập
   const { itemCount } = useCart();                       // Tổng số sản phẩm trong giỏ hàng
   const location = useLocation();                        // URL hiện tại
   const navigate = useNavigate();                        // Hàm điều hướng
+
+  // Fetch logo từ settings
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const settings = await settingAPI.getAll();
+        if (settings.logo_url) {
+          setLogoUrl(resolveImageUrl(settings.logo_url));
+        }
+      } catch (error) {
+        console.error('Error fetching logo:', error);
+      }
+    };
+    fetchLogo();
+  }, []);
 
   // ===== Xử lý tìm kiếm khi nhấn Enter =====
   // Chuyển hướng đến trang sản phẩm kèm query string tìm kiếm
@@ -74,15 +91,19 @@ export default function Header() {
         
         {/* ===== LOGO ===== */}
         <Link to="/" className="flex items-center gap-3 z-50">
-          {/* SVG logo hình ngôi sao trầm hương */}
-          <div className="w-12 h-12">
-            <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M30 5 L35 20 L45 15 L38 28 L50 30 L38 32 L45 45 L35 40 L30 55 L25 40 L15 45 L22 32 L10 30 L22 28 L15 15 L25 20 Z"
-                fill="#2D5016" stroke="rgba(45,80,22,0.3)" strokeWidth="0.5"
-              />
-              <circle cx="30" cy="30" r="6" fill="none" stroke="#C4A35A" strokeWidth="1" />
-            </svg>
+          {/* Logo ảnh từ settings hoặc SVG mặc định */}
+          <div className="w-12 h-12 flex items-center justify-center">
+            {logoUrl ? (
+              <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
+            ) : (
+              <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M30 5 L35 20 L45 15 L38 28 L50 30 L38 32 L45 45 L35 40 L30 55 L25 40 L15 45 L22 32 L10 30 L22 28 L15 15 L25 20 Z"
+                  fill="#2D5016" stroke="rgba(45,80,22,0.3)" strokeWidth="0.5"
+                />
+                <circle cx="30" cy="30" r="6" fill="none" stroke="#C4A35A" strokeWidth="1" />
+              </svg>
+            )}
           </div>
           {/* Tên thương hiệu */}
           <div className="flex flex-col leading-tight">
