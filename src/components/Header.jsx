@@ -29,8 +29,8 @@ export default function Header() {
     const fetchLogo = async () => {
       try {
         const settings = await settingAPI.getAll();
-        if (settings.logo_url) {
-          setLogoUrl(resolveImageUrl(settings.logo_url));
+        if (settings.data && settings.data.logo_url) {
+          setLogoUrl(resolveImageUrl(settings.data.logo_url));
         }
       } catch (error) {
         console.error('Error fetching logo:', error);
@@ -45,8 +45,8 @@ export default function Header() {
       console.log('📢 Logo updated event received, refetching...');
       try {
         const settings = await settingAPI.getAll();
-        if (settings.logo_url) {
-          const newLogoUrl = resolveImageUrl(settings.logo_url);
+        if (settings.data && settings.data.logo_url) {
+          const newLogoUrl = resolveImageUrl(settings.data.logo_url);
           setLogoUrl(newLogoUrl);
           console.log('✓ Logo refetched:', newLogoUrl);
         }

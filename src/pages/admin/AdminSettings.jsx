@@ -31,7 +31,7 @@ export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
-  const [activeTab, setActiveTab] = useState('contact'); // 'contact' hoặc 'hero'
+  const [activeTab, setActiveTab] = useState('branding'); // 'branding', 'contact' hoặc 'hero'
   const [heroImagePreview, setHeroImagePreview] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [heroImageFile, setHeroImageFile] = useState(null);
@@ -41,8 +41,8 @@ export default function AdminSettings() {
     fetchSettings();
   }, []);
 
-  const fetchSettings = async () => {
-    setLoading(true);
+  const fetchSettings = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await settingAPI.getAll();
       setFormData(res.data);
@@ -56,7 +56,7 @@ export default function AdminSettings() {
     } catch (error) {
       console.error('Lỗi khi tải cài đặt:', error);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -85,10 +85,34 @@ export default function AdminSettings() {
     setSaving(true);
     setMessage('');
     try {
-      const settingsToSave = [];
+      // 1. Luôn upload ảnh nếu có bất kỳ thay đổi nào về ảnh
+      if (heroImageFile || logoFile) {
+        console.log('📤 Uploading images...');
+        const formDataImages = new FormData();
+        if (heroImageFile) {
+          console.log('  - Adding hero_image:', heroImageFile.name);
+          formDataImages.append('hero_image', heroImageFile);
+        }
+        if (logoFile) {
+          console.log('  - Adding logo_image:', logoFile.name);
+          formDataImages.append('logo_image', logoFile);
+        }
+        console.log('  - Sending to API...');
+        const uploadRes = await settingAPI.uploadHeroImages(formDataImages);
+        console.log('✓ Upload response:', uploadRes);
+        
+        // Broadcast event để các components khác biết logo đã update
+        window.dispatchEvent(new CustomEvent('logoUpdated', { 
+          detail: { timestamp: Date.now() } 
+        }));
+        
+        setHeroImageFile(null);
+        setLogoFile(null);
+      }
 
+      // 2. Lưu text settings dựa theo tab hiện tại
+      const settingsToSave = [];
       if (activeTab === 'contact') {
-        // Lưu contact fields
         CONTACT_FIELDS.forEach(f => {
           settingsToSave.push({
             key: f.key,
@@ -97,32 +121,6 @@ export default function AdminSettings() {
         });
         await settingAPI.bulkUpsert(settingsToSave);
       } else if (activeTab === 'hero') {
-        // Upload ảnh TRƯỚC (nếu có)
-        if (heroImageFile || logoFile) {
-          console.log('📤 Uploading images...');
-          const formDataImages = new FormData();
-          if (heroImageFile) {
-            console.log('  - Adding hero_image:', heroImageFile.name);
-            formDataImages.append('hero_image', heroImageFile);
-          }
-          if (logoFile) {
-            console.log('  - Adding logo_image:', logoFile.name);
-            formDataImages.append('logo_image', logoFile);
-          }
-          console.log('  - Sending to API...');
-          const uploadRes = await settingAPI.uploadHeroImages(formDataImages);
-          console.log('✓ Upload response:', uploadRes);
-          
-          // Broadcast event để các components khác biết logo đã update
-          window.dispatchEvent(new CustomEvent('logoUpdated', { 
-            detail: { timestamp: Date.now() } 
-          }));
-          
-          setHeroImageFile(null);
-          setLogoFile(null);
-        }
-
-        // Lưu hero text fields (không include image URLs vì đã upload rồi)
         HERO_FIELDS.forEach(f => {
           settingsToSave.push({
             key: f.key,
@@ -131,6 +129,9 @@ export default function AdminSettings() {
         });
         await settingAPI.bulkUpsert(settingsToSave);
       }
+
+      // 3. Tải lại cài đặt mới nhất từ DB/Cloudinary để hiển thị đúng URL thật
+      await fetchSettings(false);
 
       setMessage('Lưu cài đặt thành công!');
       setTimeout(() => setMessage(''), 3000);
@@ -157,9 +158,18 @@ export default function AdminSettings() {
         </button>
       </div>
 
-      {/* Tabs */}
       <div className="border-b border-gray-100">
         <div className="flex">
+          <button
+            onClick={() => setActiveTab('branding')}
+            className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors border-b-2 ${
+              activeTab === 'branding'
+                ? 'text-[var(--color-primary)] border-[var(--color-primary)]'
+                : 'text-gray-600 border-transparent hover:text-gray-800'
+            }`}
+          >
+            Thương hiệu & Logo
+          </button>
           <button
             onClick={() => setActiveTab('contact')}
             className={`flex-1 px-6 py-4 text-sm font-semibold transition-colors border-b-2 ${
@@ -178,7 +188,7 @@ export default function AdminSettings() {
                 : 'text-gray-600 border-transparent hover:text-gray-800'
             }`}
           >
-            Hero Section
+            Nội dung Banner (Hero)
           </button>
         </div>
       </div>
@@ -192,223 +202,140 @@ export default function AdminSettings() {
       )}
 
       <div className="p-6">
-        {activeTab === 'contact' && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {CONTACT_FIELDS.map((field) => {
-                const Icon = field.icon;
-                return (
-                  <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                      <Icon size={16} className="text-[var(--color-primary)]" />
-                      {field.label}
-                    </label>
-                    {field.multiline ? (
-                      <textarea
-                        value={formData[field.key] || ''}
-                        onChange={(e) => handleChange(field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 focus:bg-white outline-none transition-all resize-y"
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        value={formData[field.key] || ''}
-                        onChange={(e) => handleChange(field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 focus:bg-white outline-none transition-all"
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-8 p-5 bg-gray-50 rounded-xl">
-              <h3 className="text-sm font-bold text-gray-700 mb-3">Xem trước</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <PreviewCard icon={FiMapPin} title="Địa chỉ" lines={[formData.address || '(chưa có)']} />
-                <PreviewCard icon={FiPhone} title="Điện thoại" lines={[
-                  `Hotline: ${formData.hotline || '(chưa có)'}`,
-                  `CSKH: ${formData.phone_cskh || '(chưa có)'}`
-                ]} />
-                <PreviewCard icon={FiMail} title="Email" lines={[
-                  formData.email_main || '(chưa có)',
-                  formData.email_support || '(chưa có)'
-                ]} />
-                <PreviewCard icon={FiClock} title="Giờ làm việc" lines={[
-                  `Thứ 2 - Thứ 7: ${formData.hours_weekday || '(chưa có)'}`,
-                  `Chủ nhật: ${formData.hours_sunday || '(chưa có)'}`
-                ]} />
-              </div>
-            </div>
-          </>
-        )}
-
-        {activeTab === 'hero' && (
-          <>
-            {/* Hero Images Section */}
-            <div className="mb-8 p-5 bg-gray-50 rounded-xl">
-              <h3 className="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
-                <FiImage size={16} className="text-[var(--color-primary)]" />
-                Hình ảnh Hero
+        {activeTab === 'branding' && (
+          <div className="space-y-8">
+            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
+              <h3 className="text-base font-bold text-gray-800 mb-2 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)]"></span>
+                Logo Website
               </h3>
+              <p className="text-xs text-gray-500 mb-6">Logo chính thức hiển thị trên thanh điều hướng (Navbar) và chân trang (Footer).</p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Hero Main Image */}
-                <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                    Ảnh Hero (Ảnh chính bên phải)
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      id="hero-image"
-                      accept="image/*"
-                      onChange={(e) => handleImageChange(e, 'hero')}
-                      className="hidden"
-                    />
-                    <label
-                      htmlFor="hero-image"
-                      className="block aspect-video bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden cursor-pointer hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-50)] transition-all"
-                    >
-                      {heroImagePreview ? (
-                        <img src={heroImagePreview} alt="Hero preview" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center flex-col gap-2 text-gray-400">
-                          <FiImage size={32} />
-                          <span className="text-sm">Chọn ảnh hero</span>
-                        </div>
-                      )}
-                    </label>
-                    {heroImagePreview && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setHeroImagePreview(null);
-                          setHeroImageFile(null);
-                          document.getElementById('hero-image').value = '';
-                        }}
-                        className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                      >
-                        <FiX size={16} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Logo */}
-                <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                    Logo (Ảnh phía trên)
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      id="logo-image"
-                      accept="image/*"
-                      onChange={(e) => handleImageChange(e, 'logo')}
-                      className="hidden"
-                    />
-                    <label
-                      htmlFor="logo-image"
-                      className="block aspect-video bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden cursor-pointer hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-50)] transition-all"
-                    >
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                <div className="md:col-span-5">
+                  <div className="relative group">
+                    <input type="file" id="logo-image" accept="image/*" onChange={(e) => handleImageChange(e, 'logo')} className="hidden" />
+                    <label htmlFor="logo-image" className="block aspect-[4/3] bg-white border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-50)]/30 transition-all shadow-sm">
                       {logoPreview ? (
-                        <img src={logoPreview} alt="Logo preview" className="w-full h-full object-cover" />
+                        <div className="w-full h-full relative p-4 flex items-center justify-center bg-gray-50">
+                          <img src={logoPreview} alt="Logo preview" className="max-w-full max-h-full object-contain" />
+                        </div>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center flex-col gap-2 text-gray-400">
-                          <FiImage size={32} />
-                          <span className="text-sm">Chọn ảnh logo</span>
+                        <div className="w-full h-full flex items-center justify-center flex-col gap-3 text-gray-400 p-6">
+                          <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-[var(--color-primary-100)] group-hover:text-[var(--color-primary)] transition-all">
+                            <FiImage size={24} />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-700">Chọn ảnh logo mới</span>
                         </div>
                       )}
                     </label>
                     {logoPreview && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setLogoPreview(null);
-                          setLogoFile(null);
-                          document.getElementById('logo-image').value = '';
-                        }}
-                        className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                      >
+                      <button type="button" onClick={() => { setLogoPreview(null); setLogoFile(null); document.getElementById('logo-image').value = ''; }} className="absolute top-3 right-3 p-2 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-lg transition-colors z-10">
                         <FiX size={16} />
                       </button>
                     )}
                   </div>
                 </div>
+
+                <div className="md:col-span-7 space-y-4">
+                  <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Xem trước hiển thị</h4>
+                  <div className="p-4 bg-white border border-gray-100 rounded-xl shadow-sm flex items-center justify-between">
+                    <span className="text-xs font-semibold text-gray-400">Trên thanh Nav:</span>
+                    <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-50">
+                      <div className="w-8 h-8 flex items-center justify-center">
+                        {logoPreview ? <img src={logoPreview} alt="Mockup" className="w-full h-full object-contain" /> : <span className="text-xs text-gray-300">Logo</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-[#1E293B] rounded-xl flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400">Trên Footer:</span>
+                    <div className="flex items-center gap-2 bg-[#0F172A] px-3 py-1.5 rounded-lg">
+                      <div className="w-8 h-8 flex items-center justify-center">
+                        {logoPreview ? <img src={logoPreview} alt="Mockup" className="w-full h-full object-contain" /> : <span className="text-xs text-gray-500">Logo</span>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Hero Text Content */}
-            <div className="mb-8">
-              <h3 className="text-sm font-bold text-gray-700 mb-4">Nội dung Hero</h3>
+            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
+              <h3 className="text-base font-bold text-gray-800 mb-2 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)]"></span>
+                Ảnh nền chính (Hero Banner)
+              </h3>
+              <div className="relative group max-w-2xl">
+                <input type="file" id="hero-image" accept="image/*" onChange={(e) => handleImageChange(e, 'hero')} className="hidden" />
+                <label htmlFor="hero-image" className="block aspect-video bg-white border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-50)]/30 transition-all shadow-sm">
+                  {heroImagePreview ? (
+                    <img src={heroImagePreview} alt="Hero preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center flex-col gap-3 text-gray-400 p-6">
+                      <FiImage size={24} />
+                      <span className="text-sm font-semibold text-gray-700">Chọn ảnh hero banner</span>
+                    </div>
+                  )}
+                </label>
+                {heroImagePreview && (
+                  <button type="button" onClick={() => { setHeroImagePreview(null); setHeroImageFile(null); document.getElementById('hero-image').value = ''; }} className="absolute top-3 right-3 p-2 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-lg transition-colors z-10">
+                    <FiX size={16} />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'contact' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {CONTACT_FIELDS.map((field) => {
+              const Icon = field.icon;
+              return (
+                <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                    <Icon size={16} className="text-[var(--color-primary)]" />
+                    {field.label}
+                  </label>
+                  {field.multiline ? (
+                    <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 outline-none transition-all resize-y" />
+                  ) : (
+                    <input type="text" value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 outline-none transition-all" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {activeTab === 'hero' && (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-sm font-bold text-gray-700 mb-4">Nội dung Banner (Hero Section)</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {HERO_FIELDS.map((field) => (
                   <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
-                    <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                      {field.label}
-                    </label>
+                    <label className="text-sm font-semibold text-gray-700 mb-2 block">{field.label}</label>
                     {field.multiline ? (
-                      <textarea
-                        value={formData[field.key] || ''}
-                        onChange={(e) => handleChange(field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                        rows={3}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 focus:bg-white outline-none transition-all resize-y"
-                      />
+                      <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 outline-none transition-all" />
                     ) : (
-                      <input
-                        type="text"
-                        value={formData[field.key] || ''}
-                        onChange={(e) => handleChange(field.key, e.target.value)}
-                        placeholder={field.placeholder}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 focus:bg-white outline-none transition-all"
-                      />
+                      <input type="text" value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/10 outline-none transition-all" />
                     )}
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Hero Preview */}
+            
             <div className="p-5 bg-gradient-to-br from-[#faf6ed] via-[#f5ede0] to-[#ebdfc8] rounded-xl border border-gray-200">
               <h3 className="text-sm font-bold text-gray-800 mb-4">Xem trước Hero Section</h3>
-              
               <div className="bg-white rounded-lg p-6 space-y-4">
                 <div className="text-center">
-                  <p className="text-xs text-[var(--color-gold-dark)] font-semibold uppercase tracking-wider mb-2">
-                    {formData.hero_subtitle || 'Tinh Hoa Trầm Hương Việt'}
-                  </p>
-                  <h1 className="text-2xl font-bold text-[var(--color-primary)] mb-3">
-                    {formData.hero_title_line1 || 'Khám Phá Vẻ Đẹp'}<br />
-                    {formData.hero_title_line2 || 'Tinh Khôi Của'}<br />
-                    <span className="text-[var(--color-gold-dark)]">
-                      {formData.hero_title_highlight || 'Trầm Hương Tâm An'}
-                    </span>
-                  </h1>
-                  <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto">
-                    {formData.hero_description || 'Mang đến những sản phẩm trầm hương thiên nhiên cao cấp nhất...'}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-3 gap-3 pt-4 border-t border-gray-200">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="text-center">
-                      <div className="text-lg font-bold text-[var(--color-primary)]">
-                        {formData[`hero_stat${i}_value`] || '0'}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {formData[`hero_stat${i}_label`] || 'Thống kê'}
-                      </div>
-                    </div>
-                  ))}
+                  <p className="text-xs text-[var(--color-gold-dark)] font-semibold uppercase tracking-wider mb-2">{formData.hero_subtitle || '...'}</p>
+                  <h1 className="text-2xl font-bold text-[var(--color-primary)]">{formData.hero_title_line1 || '...'}</h1>
+                  <p className="text-sm text-gray-600 mt-2">{formData.hero_description || '...'}</p>
                 </div>
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
