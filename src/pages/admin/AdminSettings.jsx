@@ -112,6 +112,12 @@ export default function AdminSettings() {
           console.log('  - Sending to API...');
           const uploadRes = await settingAPI.uploadHeroImages(formDataImages);
           console.log('✓ Upload response:', uploadRes);
+          
+          // Broadcast event để các components khác biết logo đã update
+          window.dispatchEvent(new CustomEvent('logoUpdated', { 
+            detail: { timestamp: Date.now() } 
+          }));
+          
           setHeroImageFile(null);
           setLogoFile(null);
         }

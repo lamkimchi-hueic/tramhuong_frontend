@@ -15,6 +15,17 @@ export default function HeroSection() {
     setLoaded(true);
   }, []);
 
+  // Lắng nghe event logo/hero update từ admin
+  useEffect(() => {
+    const handleHeroUpdate = () => {
+      console.log('📢 Hero/Logo updated event received, refetching...');
+      fetchSettings();
+    };
+
+    window.addEventListener('logoUpdated', handleHeroUpdate);
+    return () => window.removeEventListener('logoUpdated', handleHeroUpdate);
+  }, []);
+
   const fetchSettings = async () => {
     try {
       const res = await settingAPI.getAll();

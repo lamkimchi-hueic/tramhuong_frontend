@@ -39,6 +39,26 @@ export default function Header() {
     fetchLogo();
   }, []);
 
+  // Lắng nghe event logo update từ admin
+  useEffect(() => {
+    const handleLogoUpdate = async () => {
+      console.log('📢 Logo updated event received, refetching...');
+      try {
+        const settings = await settingAPI.getAll();
+        if (settings.logo_url) {
+          const newLogoUrl = resolveImageUrl(settings.logo_url);
+          setLogoUrl(newLogoUrl);
+          console.log('✓ Logo refetched:', newLogoUrl);
+        }
+      } catch (error) {
+        console.error('Error refetching logo:', error);
+      }
+    };
+
+    window.addEventListener('logoUpdated', handleLogoUpdate);
+    return () => window.removeEventListener('logoUpdated', handleLogoUpdate);
+  }, []);
+
   // ===== Xử lý tìm kiếm khi nhấn Enter =====
   // Chuyển hướng đến trang sản phẩm kèm query string tìm kiếm
   const handleSearch = (e) => {
