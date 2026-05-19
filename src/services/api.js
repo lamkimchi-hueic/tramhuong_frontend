@@ -141,6 +141,7 @@ export const settingAPI = {
   getByKey: (key) => api.get(`/settings/${key}`),                         // Lấy 1 cài đặt theo key
   upsert: (data) => api.post('/settings', data),                          // Tạo mới hoặc cập nhật 1 cài đặt
   bulkUpsert: (settings) => api.put('/settings/bulk', { settings }),       // Cập nhật nhiều cài đặt cùng lúc
+  uploadHeroImages: (formData) => api.post('/settings/hero/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } }), // Upload hero images
   delete: (key) => api.delete(`/settings/${key}`),                        // Xóa 1 cài đặt
 };
 

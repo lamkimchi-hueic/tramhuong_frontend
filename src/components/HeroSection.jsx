@@ -1,15 +1,45 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
-const productImage = 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780041/tramhuong/assets/thac.jpg';
+import { settingAPI, resolveImageUrl } from '../services/api';
+
+const defaultHeroImage = 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780041/tramhuong/assets/thac.jpg';
 const altImage = 'https://images.unsplash.com/photo-1545048702-79362596cdc9?auto=format&fit=crop&w=1200&q=85';
 
 export default function HeroSection() {
   const [loaded, setLoaded] = useState(false);
+  const [settings, setSettings] = useState({});
 
   useEffect(() => {
+    fetchSettings();
     setLoaded(true);
   }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await settingAPI.getAll();
+      setSettings(res.data || {});
+    } catch (error) {
+      console.error('Lỗi khi tải hero settings:', error);
+    }
+  };
+
+  // Get values from settings or use defaults
+  const heroImage = settings.hero_image_url 
+    ? resolveImageUrl(settings.hero_image_url)
+    : defaultHeroImage;
+  const heroSubtitle = settings.hero_subtitle || 'Tinh Hoa Trầm Hương Việt';
+  const heroTitleLine1 = settings.hero_title_line1 || 'Khám Phá Vẻ Đẹp';
+  const heroTitleLine2 = settings.hero_title_line2 || 'Tinh Khôi Của';
+  const heroTitleHighlight = settings.hero_title_highlight || 'Trầm Hương Tâm An';
+  const heroDescription = settings.hero_description || 'Mang đến những sản phẩm trầm hương thiên nhiên cao cấp nhất, chế tác tỉ mỉ từ bàn tay nghệ nhân lành nghề.';
+  
+  const stat1Value = settings.hero_stat1_value || '10+';
+  const stat1Label = settings.hero_stat1_label || 'Năm kinh nghiệm';
+  const stat2Value = settings.hero_stat2_value || '5K+';
+  const stat2Label = settings.hero_stat2_label || 'Khách hàng';
+  const stat3Value = settings.hero_stat3_value || '100%';
+  const stat3Label = settings.hero_stat3_label || 'Thiên nhiên';
 
   return (
     <section
@@ -29,21 +59,20 @@ export default function HeroSection() {
         >
           <span className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-white/70 backdrop-blur border border-[var(--color-gold)]/40 rounded-full text-[var(--color-gold-dark)] text-[10px] sm:text-xs font-semibold tracking-[1.5px] sm:tracking-[2px] uppercase mb-4 sm:mb-6 shadow-sm transition-all duration-700 delay-300 ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-6'}`}>
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)]" />
-            Tinh Hoa Trầm Hương Việt
+            {heroSubtitle}
           </span>
 
           <h1 className={`font-[family-name:var(--font-heading)] text-[1.6rem] sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-[var(--color-primary)] leading-[1.2] sm:leading-[1.15] mb-4 sm:mb-5 transition-all duration-1000 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            Khám Phá Vẻ Đẹp<br />
-            Tinh Khôi Của<br />
+            {heroTitleLine1}<br />
+            {heroTitleLine2}<br />
             <span className="relative inline-block whitespace-nowrap">
-              <span className="text-[var(--color-gold-dark)]">Trầm Hương Tâm An</span>
+              <span className="text-[var(--color-gold-dark)]">{heroTitleHighlight}</span>
               <span className={`absolute -bottom-1.5 sm:-bottom-2 left-0 h-0.5 sm:h-1 bg-gradient-to-r from-[var(--color-gold)] to-transparent rounded-full transition-all duration-1000 delay-700 ${loaded ? 'right-0' : 'right-full'}`} />
             </span>
           </h1>
 
           <p className={`text-xs sm:text-sm md:text-base text-gray-600 leading-relaxed mb-5 sm:mb-6 max-w-lg mx-auto lg:mx-0 transition-all duration-800 delay-400 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-            Mang đến những sản phẩm trầm hương thiên nhiên cao cấp nhất,
-            chế tác tỉ mỉ từ bàn tay nghệ nhân lành nghề.
+            {heroDescription}
           </p>
 
           <div className={`flex flex-col sm:flex-row gap-2.5 sm:gap-3 mb-5 sm:mb-6 md:mb-8 justify-center lg:justify-start transition-all duration-800 delay-500 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
@@ -65,16 +94,16 @@ export default function HeroSection() {
           {/* Stats */}
           <div className={`grid grid-cols-3 gap-3 sm:gap-4 pt-4 border-t border-[var(--color-primary)]/15 max-w-xs sm:max-w-md mx-auto lg:mx-0 transition-all duration-800 delay-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
             <div>
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">10+</div>
-              <div className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-0.5">Năm kinh nghiệm</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">{stat1Value}</div>
+              <div className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-0.5">{stat1Label}</div>
             </div>
             <div>
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">5K+</div>
-              <div className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-0.5">Khách hàng</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">{stat2Value}</div>
+              <div className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-0.5">{stat2Label}</div>
             </div>
             <div>
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">100%</div>
-              <div className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-0.5">Thiên nhiên</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--color-primary)] font-[family-name:var(--font-heading)]">{stat3Value}</div>
+              <div className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-0.5">{stat3Label}</div>
             </div>
           </div>
         </div>
@@ -88,7 +117,7 @@ export default function HeroSection() {
           {/* Main image */}
           <div className="relative aspect-[4/5] w-full max-w-[220px] sm:max-w-[280px] md:max-w-sm lg:max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-[var(--color-primary)]/20 img-hover-zoom">
             <img
-              src={productImage}
+              src={heroImage}
               alt="Trầm Hương cao cấp"
               className="w-full h-full object-cover img-ken-burns"
               onError={(e) => { e.currentTarget.src = altImage; }}
