@@ -22,6 +22,27 @@ export const resolveImageUrl = (url) => {
   return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
+// ==================== HÀM TỐI ƯU HÓA ẢNH DÙNG CLOUDINARY ====================
+// Chức năng: Chuyển đổi URL ảnh và áp dụng các thuộc tính nén thông minh từ Cloudinary (f_auto, q_auto)
+// cùng với chiều rộng mong muốn (width) để giảm thiểu băng thông tải trang trên thiết bị di động.
+export const getOptimizedImageUrl = (url, width = 800) => {
+  if (!url) return null;
+  
+  // 1. Chuyển đường dẫn tương đối thành tuyệt đối trước
+  let resolvedUrl = url;
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    const base = (API_BASE_URL || '').replace(/\/api\/?$/, '');
+    resolvedUrl = `${base}${url.startsWith('/') ? '' : '/'}${url}`;
+  }
+
+  // 2. Tự động thêm tham số Cloudinary để tối ưu định dạng và kích thước nếu là link Cloudinary
+  if (resolvedUrl.includes('cloudinary.com') && resolvedUrl.includes('/upload/')) {
+    return resolvedUrl.replace('/upload/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
+  }
+
+  return resolvedUrl;
+};
+
 // ==================== TẠO INSTANCE AXIOS ====================
 // Tạo một instance Axios dùng chung cho toàn bộ ứng dụng
 // với baseURL là đường dẫn API gốc và header mặc định là JSON

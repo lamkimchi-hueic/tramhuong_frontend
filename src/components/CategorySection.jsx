@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowUpRight } from 'react-icons/fi';
-import { categoryAPI, resolveImageUrl } from '../services/api';
+import { categoryAPI, resolveImageUrl, getOptimizedImageUrl } from '../services/api';
 import useScrollReveal from '../hooks/useScrollReveal';
 
 export default function CategorySection() {
@@ -47,7 +47,7 @@ export default function CategorySection() {
             >
               {cat.image_url ? (
                 <img
-                  src={resolveImageUrl(cat.image_url)}
+                  src={getOptimizedImageUrl(cat.image_url, 450)}
                   alt={cat.category_name}
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-108"

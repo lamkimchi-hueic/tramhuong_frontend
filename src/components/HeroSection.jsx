@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowRight } from 'react-icons/fi';
-import { settingAPI, resolveImageUrl } from '../services/api';
+import { settingAPI, resolveImageUrl, getOptimizedImageUrl } from '../services/api';
 
 const defaultHeroImage = 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780041/tramhuong/assets/thac.jpg';
 const altImage = 'https://images.unsplash.com/photo-1545048702-79362596cdc9?auto=format&fit=crop&w=1200&q=85';
@@ -36,9 +36,14 @@ export default function HeroSection() {
   };
 
   // Get values from settings or use defaults
-  const heroImage = settings.hero_image_url 
-    ? resolveImageUrl(settings.hero_image_url)
-    : defaultHeroImage;
+  const heroImageMobile = settings.hero_image_url 
+    ? getOptimizedImageUrl(settings.hero_image_url, 500)
+    : getOptimizedImageUrl(defaultHeroImage, 500);
+
+  const heroImageDesktop = settings.hero_image_url 
+    ? getOptimizedImageUrl(settings.hero_image_url, 900)
+    : getOptimizedImageUrl(defaultHeroImage, 900);
+
   const heroSubtitle = settings.hero_subtitle || 'Tinh Hoa Trầm Hương Việt';
   const heroTitleLine1 = settings.hero_title_line1 || 'Khám Phá Vẻ Đẹp';
   const heroTitleLine2 = settings.hero_title_line2 || 'Tinh Khôi Của';
@@ -128,7 +133,9 @@ export default function HeroSection() {
           {/* Main image */}
           <div className="relative aspect-[4/5] w-full max-w-[220px] sm:max-w-[280px] md:max-w-sm lg:max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-[var(--color-primary)]/20 img-hover-zoom">
             <img
-              src={heroImage}
+              src={heroImageDesktop}
+              srcSet={`${heroImageMobile} 500w, ${heroImageDesktop} 900w`}
+              sizes="(max-width: 768px) 500px, 900px"
               alt="Trầm Hương cao cấp"
               className="w-full h-full object-cover img-ken-burns"
               fetchPriority="high"

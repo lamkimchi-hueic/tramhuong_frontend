@@ -9,7 +9,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiHeart, FiShoppingBag } from 'react-icons/fi';
-import { resolveImageUrl } from '../services/api'; // Hàm chuyển đổi URL ảnh
+import { resolveImageUrl, getOptimizedImageUrl } from '../services/api'; // Hàm chuyển đổi URL ảnh
 
 export default function ProductCard({ product }) {
   const [liked, setLiked] = useState(false);     // Trạng thái yêu thích (trái tim đỏ)
@@ -54,7 +54,7 @@ export default function ProductCard({ product }) {
             src={imgError
               ? 'https://placehold.co/400x400/E8F0E0/2D5016?text=Tram+Huong' // Ảnh fallback khi lỗi
               : product.image_url
-                ? resolveImageUrl(product.image_url) // Chuyển đổi URL ảnh (Cloudinary hoặc local)
+                ? getOptimizedImageUrl(product.image_url, 400) // Tải ảnh kích thước tối ưu 400px
                 : `https://placehold.co/400x400/E8F0E0/2D5016?text=Tram+Huong` // Ảnh placeholder nếu không có
             }
             alt={product.product_name}

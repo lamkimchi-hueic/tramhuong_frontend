@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiSun, FiHeart, FiWind, FiDroplet } from 'react-icons/fi';
-import { settingAPI, resolveImageUrl } from '../services/api';
+import { settingAPI, resolveImageUrl, getOptimizedImageUrl } from '../services/api';
 import useScrollReveal from '../hooks/useScrollReveal';
 
 // Ảnh mặc định nếu admin chưa cấu hình
@@ -55,10 +55,8 @@ export default function BlogSection() {
     desc: data[`blog_feature${n}_desc`],
   }));
 
-  // Xử lý image URL
-  const blogImg = data.blog_image_url?.startsWith('http')
-    ? data.blog_image_url
-    : resolveImageUrl(data.blog_image_url);
+  // Xử lý image URL - Tải ảnh nén tối ưu ở 600px width
+  const blogImg = getOptimizedImageUrl(data.blog_image_url, 600);
 
   // Xử lý title (hỗ trợ xuống dòng bằng \n)
   const titleParts = data.blog_title.split('\n');
