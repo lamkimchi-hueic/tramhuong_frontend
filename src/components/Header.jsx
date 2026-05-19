@@ -176,6 +176,7 @@ export default function Header() {
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 relative z-10 ${
                 searchOpen ? 'text-[var(--color-primary)]' : 'text-[#2D5016]'
               } hover:bg-[var(--color-primary)]/10`}
+              aria-label="Tìm kiếm"
             >
               {searchOpen ? <FiX size={18} /> : <FiSearch size={18} />}
             </button>
@@ -207,6 +208,7 @@ export default function Header() {
                 id="user-menu-btn"
                 onClick={() => setUserMenuOpen(!userMenuOpen)} // Toggle mở/đóng dropdown
                 className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:bg-[var(--color-primary)]/10 text-[#2D5016]`}
+                aria-label="Tài khoản"
               >
                 <FiUser size={18} />
               </button>
@@ -261,6 +263,7 @@ export default function Header() {
           onClick={() => setMenuOpen(!menuOpen)} // Toggle mở/đóng menu mobile
           className={`md:hidden text-xl text-[#2D5016]`}
           style={{ zIndex: 10000001, position: 'relative' }}
+          aria-label={menuOpen ? 'Đóng menu' : 'Mở menu'}
         >
           {menuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
         </button>
