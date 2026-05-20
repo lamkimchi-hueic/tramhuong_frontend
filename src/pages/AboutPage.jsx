@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiHome, FiChevronRight } from 'react-icons/fi';
-const aboutImg = 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780029/tramhuong/assets/about_process.jpg';
-const blogImg = 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780032/tramhuong/assets/blog_lifestyle.jpg';
+import { settingAPI, resolveImageUrl } from '../services/api';
 
-const values = [
+const DEFAULT_VALUES = [
   { emoji: '🌿', title: 'Thiên Nhiên Thuần Khiết', desc: '100% trầm hương tự nhiên, không pha tạp. Nguyên liệu được tuyển chọn từ các vùng trầm hương nổi tiếng.' },
   { emoji: '✨', title: 'Chất Lượng Cao Cấp', desc: 'Mỗi sản phẩm đều trải qua quy trình kiểm tra nghiêm ngặt, đảm bảo chất lượng tốt nhất.' },
   { emoji: '🤝', title: 'Tận Tâm Phục Vụ', desc: 'Đội ngũ tư vấn chuyên nghiệp, sẵn sàng hỗ trợ khách hàng 24/7 với dịch vụ hậu mãi chu đáo.' },
@@ -12,6 +11,39 @@ const values = [
 
 export default function AboutPage() {
   const [activeValue, setActiveValue] = useState(null);
+  const [settings, setSettings] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await settingAPI.getAll();
+        setSettings(res.data || {});
+      } catch (error) {
+        console.error('Lỗi khi tải cài đặt:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  // Lấy dữ liệu từ settings với fallback mặc định
+  const aboutTitle = settings.about_title || 'Tinh Hoa Trầm Hương Việt Nam';
+  const aboutP1 = settings.about_p1 || 'Trầm Hương Tâm An được thành lập với mong muốn mang đến những sản phẩm trầm hương thiên nhiên chất lượng cao nhất cho người tiêu dùng Việt Nam.';
+  const aboutP2 = settings.about_p2 || 'Với đội ngũ nghệ nhân giàu kinh nghiệm, chúng tôi cam kết mỗi sản phẩm đều được chế tác tỉ mỉ, từ khâu chọn nguyên liệu đến thành phẩm cuối cùng.';
+  const aboutP3 = settings.about_p3 || 'Không chỉ là sản phẩm, mỗi tác phẩm trầm hương của chúng tôi còn mang theo giá trị văn hóa và tâm linh sâu sắc của người Việt.';
+  
+  const aboutImageUrl = settings.about_image_url
+    ? resolveImageUrl(settings.about_image_url)
+    : 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780029/tramhuong/assets/about_process.jpg';
+
+  const processTitle = settings.process_title || 'Quy Trình Chế Tác';
+  const processDesc = settings.process_description || 'Từ việc lựa chọn nguyên liệu thô đến sản phẩm hoàn thiện, mỗi bước trong quy trình đều được thực hiện cẩn thận bởi các nghệ nhân có tay nghề cao.\n\nChúng tôi kết hợp giữa phương pháp truyền thống và công nghệ hiện đại, tạo nên những sản phẩm vừa giữ được nét đẹp truyền thống vừa phù hợp với phong cách sống hiện đại.';
+  
+  const processImageUrl = settings.process_image_url
+    ? resolveImageUrl(settings.process_image_url)
+    : 'https://res.cloudinary.com/dcywlpxwi/image/upload/v1778780032/tramhuong/assets/blog_lifestyle.jpg';
 
   return (
     <main id="about-page">
@@ -33,23 +65,20 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="rounded-2xl overflow-hidden">
-              <img src={aboutImg} alt="Nghệ nhân chế tác" loading="lazy" className="w-full h-[450px] object-cover" />
+              <img src={aboutImageUrl} alt="Nghệ nhân chế tác" loading="lazy" className="w-full h-[450px] object-cover" />
             </div>
             <div>
               <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-5 leading-tight">
-                Tinh Hoa Trầm Hương Việt Nam
+                {aboutTitle}
               </h2>
               <p className="text-gray-500 leading-relaxed mb-4">
-                Trầm Hương Tâm An được thành lập với mong muốn mang đến những sản phẩm
-                trầm hương thiên nhiên chất lượng cao nhất cho người tiêu dùng Việt Nam.
+                {aboutP1}
               </p>
               <p className="text-gray-500 leading-relaxed mb-4">
-                Với đội ngũ nghệ nhân giàu kinh nghiệm, chúng tôi cam kết mỗi sản phẩm
-                đều được chế tác tỉ mỉ, từ khâu chọn nguyên liệu đến thành phẩm cuối cùng.
+                {aboutP2}
               </p>
               <p className="text-gray-500 leading-relaxed">
-                Không chỉ là sản phẩm, mỗi tác phẩm trầm hương của chúng tôi còn mang
-                theo giá trị văn hóa và tâm linh sâu sắc của người Việt.
+                {aboutP3}
               </p>
             </div>
           </div>
@@ -68,7 +97,7 @@ export default function AboutPage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {values.map((v, idx) => (
+            {DEFAULT_VALUES.map((v, idx) => (
               <div
                 key={idx}
                 onClick={() => setActiveValue(activeValue === idx ? null : idx)}
@@ -95,17 +124,13 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="order-2 lg:order-1">
               <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl font-bold text-[var(--color-primary)] mb-5 leading-tight">
-                Quy Trình Chế Tác
+                {processTitle}
               </h2>
-              <p className="text-gray-500 leading-relaxed mb-4">
-                Từ việc lựa chọn nguyên liệu thô đến sản phẩm hoàn thiện,
-                mỗi bước trong quy trình đều được thực hiện cẩn thận bởi các nghệ nhân có tay nghề cao.
-              </p>
-              <p className="text-gray-500 leading-relaxed mb-6">
-                Chúng tôi kết hợp giữa phương pháp truyền thống và công nghệ
-                hiện đại, tạo nên những sản phẩm vừa giữ được nét đẹp truyền thống
-                vừa phù hợp với phong cách sống hiện đại.
-              </p>
+              {processDesc.split('\n\n').map((para, idx) => (
+                <p key={idx} className="text-gray-500 leading-relaxed mb-6">
+                  {para}
+                </p>
+              ))}
               <Link
                 to="/products"
                 className="inline-flex items-center justify-center px-8 py-3.5 bg-[var(--color-primary)] text-white font-semibold text-sm uppercase tracking-wide rounded-md hover:bg-[var(--color-primary-dark)] hover:-translate-y-0.5 transition-all duration-300"
@@ -114,7 +139,7 @@ export default function AboutPage() {
               </Link>
             </div>
             <div className="order-1 lg:order-2 rounded-2xl overflow-hidden">
-              <img src={blogImg} alt="Không gian trầm hương" loading="lazy" className="w-full h-[450px] object-cover" />
+              <img src={processImageUrl} alt="Không gian trầm hương" loading="lazy" className="w-full h-[450px] object-cover" />
             </div>
           </div>
         </div>

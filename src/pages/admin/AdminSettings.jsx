@@ -41,6 +41,15 @@ const BLOG_FIELDS = [
   { key: 'blog_feature4_desc', label: 'Tính năng 4 — Mô tả', placeholder: 'Mỗi sản phẩm mang hương thơm...' },
 ];
 
+const ABOUT_FIELDS = [
+  { key: 'about_title', label: 'Tiêu đề chính', placeholder: 'Tinh Hoa Trầm Hương Việt Nam' },
+  { key: 'about_p1', label: 'Đoạn văn 1', placeholder: 'Trầm Hương Tâm An được thành lập với mong muốn...', multiline: true },
+  { key: 'about_p2', label: 'Đoạn văn 2', placeholder: 'Với đội ngũ nghệ nhân giàu kinh nghiệm...', multiline: true },
+  { key: 'about_p3', label: 'Đoạn văn 3', placeholder: 'Không chỉ là sản phẩm, mỗi tác phẩm...', multiline: true },
+  { key: 'process_title', label: 'Tiêu đề "Quy Trình Chế Tác"', placeholder: 'Quy Trình Chế Tác' },
+  { key: 'process_description', label: 'Mô tả quy trình', placeholder: 'Từ việc lựa chọn nguyên liệu...', multiline: true },
+];
+
 const DEFAULT_TESTIMONIALS = [
   { name: 'Nguyễn Minh Anh', text: 'Mình rất hài lòng với sản phẩm vòng tay trầm hương...', rating: 5 },
   { name: 'Trần Văn Hùng', text: 'Bộ quà tặng trầm hương rất sang trọng...', rating: 5 },
@@ -51,6 +60,7 @@ const TABS = [
   { id: 'branding', label: 'Thương hiệu' },
   { id: 'contact', label: 'Liên hệ' },
   { id: 'hero', label: 'Banner' },
+  { id: 'about', label: 'Về Chúng Tôi' },
   { id: 'blog', label: 'Giới thiệu' },
   { id: 'testimonials', label: 'Đánh giá KH' },
 ];
@@ -68,6 +78,10 @@ export default function AdminSettings() {
   const [logoPreview, setLogoPreview] = useState(null);
   const [heroImageFile, setHeroImageFile] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
+  const [aboutImagePreview, setAboutImagePreview] = useState(null);
+  const [processImagePreview, setProcessImagePreview] = useState(null);
+  const [aboutImageFile, setAboutImageFile] = useState(null);
+  const [processImageFile, setProcessImageFile] = useState(null);
   // Testimonials — mảng các object { name, text, rating }
   const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
 
@@ -80,6 +94,8 @@ export default function AdminSettings() {
       setFormData(res.data);
       if (res.data.hero_image_url) setHeroImagePreview(resolveImageUrl(res.data.hero_image_url));
       if (res.data.logo_url) setLogoPreview(resolveImageUrl(res.data.logo_url));
+      if (res.data.about_image_url) setAboutImagePreview(resolveImageUrl(res.data.about_image_url));
+      if (res.data.process_image_url) setProcessImagePreview(resolveImageUrl(res.data.process_image_url));
       // Parse testimonials từ JSON
       if (res.data.testimonials_data) {
         try {
@@ -103,9 +119,15 @@ export default function AdminSettings() {
     if (type === 'hero') {
       setHeroImageFile(file);
       reader.onload = (ev) => setHeroImagePreview(ev.target.result);
-    } else {
+    } else if (type === 'logo') {
       setLogoFile(file);
       reader.onload = (ev) => setLogoPreview(ev.target.result);
+    } else if (type === 'about') {
+      setAboutImageFile(file);
+      reader.onload = (ev) => setAboutImagePreview(ev.target.result);
+    } else if (type === 'process') {
+      setProcessImageFile(file);
+      reader.onload = (ev) => setProcessImagePreview(ev.target.result);
     }
     reader.readAsDataURL(file);
   };
@@ -127,14 +149,18 @@ export default function AdminSettings() {
     setMessage('');
     try {
       // Upload images nếu có
-      if (heroImageFile || logoFile) {
+      if (heroImageFile || logoFile || aboutImageFile || processImageFile) {
         const fd = new FormData();
         if (heroImageFile) fd.append('hero_image', heroImageFile);
         if (logoFile) fd.append('logo_image', logoFile);
+        if (aboutImageFile) fd.append('about_image', aboutImageFile);
+        if (processImageFile) fd.append('process_image', processImageFile);
         await settingAPI.uploadHeroImages(fd);
         window.dispatchEvent(new CustomEvent('logoUpdated', { detail: { timestamp: Date.now() } }));
         setHeroImageFile(null);
         setLogoFile(null);
+        setAboutImageFile(null);
+        setProcessImageFile(null);
       }
 
       // Save text settings theo tab
@@ -143,6 +169,8 @@ export default function AdminSettings() {
         CONTACT_FIELDS.forEach(f => settingsToSave.push({ key: f.key, value: formData[f.key] || '' }));
       } else if (activeTab === 'hero') {
         HERO_FIELDS.forEach(f => settingsToSave.push({ key: f.key, value: formData[f.key] || '' }));
+      } else if (activeTab === 'about') {
+        ABOUT_FIELDS.forEach(f => settingsToSave.push({ key: f.key, value: formData[f.key] || '' }));
       } else if (activeTab === 'blog') {
         BLOG_FIELDS.forEach(f => settingsToSave.push({ key: f.key, value: formData[f.key] || '' }));
       } else if (activeTab === 'testimonials') {
@@ -315,6 +343,77 @@ export default function AdminSettings() {
                 <p className="text-xs text-[var(--color-gold-dark)] font-semibold uppercase tracking-wider">{formData.hero_subtitle || '...'}</p>
                 <h1 className="text-2xl font-bold text-[var(--color-primary)]">{formData.hero_title_line1 || '...'}</h1>
                 <p className="text-sm text-gray-600">{formData.hero_description || '...'}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ===== TAB: About / Về Chúng Tôi ===== */}
+        {activeTab === 'about' && (
+          <div className="space-y-8">
+            <h3 className="text-sm font-bold text-gray-700 mb-4">Nội dung trang "Về Chúng Tôi"</h3>
+            
+            {/* Ảnh chế tác */}
+            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
+              <h3 className="text-base font-bold text-gray-800 mb-2 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)]"></span> Ảnh chế tác (Story Section)
+              </h3>
+              <div className="relative group max-w-2xl">
+                <input type="file" id="about-image" accept="image/*" onChange={(e) => handleImageChange(e, 'about')} className="hidden" />
+                <label htmlFor="about-image" className="block aspect-square bg-white border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-[var(--color-primary)] transition-all shadow-sm">
+                  {aboutImagePreview ? (
+                    <img src={aboutImagePreview} alt="About preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center flex-col gap-3 text-gray-400 p-6">
+                      <FiImage size={24} />
+                      <span className="text-sm font-semibold text-gray-700">Chọn ảnh chế tác</span>
+                    </div>
+                  )}
+                </label>
+                {aboutImagePreview && (
+                  <button type="button" onClick={() => { setAboutImagePreview(null); setAboutImageFile(null); }} className="absolute top-3 right-3 p-2 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-lg transition-colors z-10">
+                    <FiX size={16} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Nội dung text */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {ABOUT_FIELDS.filter(f => !f.key.includes('image')).map((field) => (
+                <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
+                  <label className="text-sm font-semibold text-gray-700 mb-2 block">{field.label}</label>
+                  {field.multiline ? (
+                    <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className={inputCls + ' resize-y'} />
+                  ) : (
+                    <input type="text" value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} className={inputCls} />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Ảnh quy trình */}
+            <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
+              <h3 className="text-base font-bold text-gray-800 mb-2 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)]"></span> Ảnh quy trình chế tác (Process Section)
+              </h3>
+              <div className="relative group max-w-2xl">
+                <input type="file" id="process-image" accept="image/*" onChange={(e) => handleImageChange(e, 'process')} className="hidden" />
+                <label htmlFor="process-image" className="block aspect-square bg-white border-2 border-dashed border-gray-200 rounded-2xl overflow-hidden cursor-pointer hover:border-[var(--color-primary)] transition-all shadow-sm">
+                  {processImagePreview ? (
+                    <img src={processImagePreview} alt="Process preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center flex-col gap-3 text-gray-400 p-6">
+                      <FiImage size={24} />
+                      <span className="text-sm font-semibold text-gray-700">Chọn ảnh quy trình</span>
+                    </div>
+                  )}
+                </label>
+                {processImagePreview && (
+                  <button type="button" onClick={() => { setProcessImagePreview(null); setProcessImageFile(null); }} className="absolute top-3 right-3 p-2 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-lg transition-colors z-10">
+                    <FiX size={16} />
+                  </button>
+                )}
               </div>
             </div>
           </div>
