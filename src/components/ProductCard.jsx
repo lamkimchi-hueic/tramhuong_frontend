@@ -8,12 +8,29 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiHeart, FiShoppingBag } from 'react-icons/fi';
+import { FiHeart, FiShoppingBag, FiCheck } from 'react-icons/fi';
+import { useCart } from '../context/CartContext';
 import { resolveImageUrl, getOptimizedImageUrl } from '../services/api'; // Hàm chuyển đổi URL ảnh
 
 export default function ProductCard({ product }) {
   const [liked, setLiked] = useState(false);     // Trạng thái yêu thích (trái tim đỏ)
   const [imgError, setImgError] = useState(false); // Trạng thái lỗi tải ảnh
+  const [added, setAdded] = useState(false);       // Trạng thái đã thêm vào giỏ hàng
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Nếu có biến thể, lấy biến thể đầu tiên tương tự như trang chi tiết
+    const selectedVariant = (product.variants && product.variants.length > 0) ? product.variants[0] : null;
+    
+    addToCart(product, 1, selectedVariant);
+    setAdded(true);
+    setTimeout(() => {
+      setAdded(false);
+    }, 2000);
+  };
 
   // ===== Hàm format giá tiền sang VNĐ =====
   const formatPrice = (price) => {
@@ -91,13 +108,25 @@ export default function ProductCard({ product }) {
           <FiHeart size={15} fill={liked ? 'white' : 'none'} />
         </button>
         {/* Nút thêm vào giỏ hàng */}
-        <Link
-          to={`/products/${product.id_product}`}
-          className="w-9 h-9 rounded-full bg-white text-gray-600 flex items-center justify-center shadow-md hover:bg-[var(--color-primary)] hover:text-white transition-colors duration-200"
-          aria-label="Xem chi tiết"
+        <button
+          onClick={handleAddToCart}
+          className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-all duration-300 relative group/btn ${
+            added
+              ? 'bg-green-600 text-white scale-110'
+              : 'bg-white text-gray-600 hover:bg-[var(--color-primary)] hover:text-white'
+          }`}
+          aria-label="Thêm vào giỏ hàng"
+          disabled={added}
         >
-          <FiShoppingBag size={15} />
-        </Link>
+          {added ? <FiCheck size={15} /> : <FiShoppingBag size={15} />}
+          
+          {/* Tooltip báo đã thêm */}
+          {added && (
+            <span className="absolute bottom-full mb-2 bg-green-600 text-white text-[10px] font-medium px-2 py-0.5 rounded shadow whitespace-nowrap animate-bounce">
+              Đã thêm!
+            </span>
+          )}
+        </button>
       </div>
 
       {/* ===== PHẦN THÔNG TIN SẢN PHẨM ===== */}
