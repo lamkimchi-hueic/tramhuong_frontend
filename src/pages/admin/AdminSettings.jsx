@@ -84,6 +84,8 @@ export default function AdminSettings() {
   const [processImageFile, setProcessImageFile] = useState(null);
   // Testimonials — mảng các object { name, text, rating }
   const [testimonials, setTestimonials] = useState(DEFAULT_TESTIMONIALS);
+  // Track updated items
+  const [updatedKeys, setUpdatedKeys] = useState(new Set());
 
   useEffect(() => { fetchSettings(); }, []);
 
@@ -179,6 +181,15 @@ export default function AdminSettings() {
 
       if (settingsToSave.length > 0) {
         await settingAPI.bulkUpsert(settingsToSave);
+        // Track updated keys
+        const newUpdatedKeys = new Set(updatedKeys);
+        settingsToSave.forEach(s => newUpdatedKeys.add(s.key));
+        setUpdatedKeys(newUpdatedKeys);
+        
+        // Clear updated status after 3 seconds
+        setTimeout(() => {
+          setUpdatedKeys(new Set());
+        }, 3000);
       }
 
       await fetchSettings(false);
@@ -304,11 +315,17 @@ export default function AdminSettings() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {CONTACT_FIELDS.map((field) => {
               const Icon = field.icon;
+              const isUpdated = updatedKeys.has(field.key);
               return (
                 <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
-                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                    <Icon size={16} className="text-[var(--color-primary)]" /> {field.label}
-                  </label>
+                  <div className="flex items-center gap-2 justify-between mb-2">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                      <Icon size={16} className="text-[var(--color-primary)]" /> {field.label}
+                    </label>
+                    {isUpdated && (
+                      <span className="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">✓ Đã cập nhật</span>
+                    )}
+                  </div>
                   {field.multiline ? (
                     <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className={inputCls + ' resize-y'} />
                   ) : (
@@ -325,16 +342,24 @@ export default function AdminSettings() {
           <div className="space-y-8">
             <h3 className="text-sm font-bold text-gray-700 mb-4">Nội dung Banner (Hero Section)</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {HERO_FIELDS.map((field) => (
-                <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">{field.label}</label>
-                  {field.multiline ? (
-                    <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className={inputCls} />
-                  ) : (
-                    <input type="text" value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} className={inputCls} />
-                  )}
-                </div>
-              ))}
+              {HERO_FIELDS.map((field) => {
+                const isUpdated = updatedKeys.has(field.key);
+                return (
+                  <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
+                    <div className="flex items-center gap-2 justify-between mb-2">
+                      <label className="text-sm font-semibold text-gray-700">{field.label}</label>
+                      {isUpdated && (
+                        <span className="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">✓ Đã cập nhật</span>
+                      )}
+                    </div>
+                    {field.multiline ? (
+                      <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className={inputCls} />
+                    ) : (
+                      <input type="text" value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} className={inputCls} />
+                    )}
+                  </div>
+                );
+              })}
             </div>
             {/* Preview */}
             <div className="p-5 bg-gradient-to-br from-[#faf6ed] via-[#f5ede0] to-[#ebdfc8] rounded-xl border border-gray-200">
@@ -380,16 +405,24 @@ export default function AdminSettings() {
 
             {/* Nội dung text */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {ABOUT_FIELDS.filter(f => !f.key.includes('image')).map((field) => (
-                <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">{field.label}</label>
-                  {field.multiline ? (
-                    <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className={inputCls + ' resize-y'} />
-                  ) : (
-                    <input type="text" value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} className={inputCls} />
-                  )}
-                </div>
-              ))}
+              {ABOUT_FIELDS.filter(f => !f.key.includes('image')).map((field) => {
+                const isUpdated = updatedKeys.has(field.key);
+                return (
+                  <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
+                    <div className="flex items-center gap-2 justify-between mb-2">
+                      <label className="text-sm font-semibold text-gray-700">{field.label}</label>
+                      {isUpdated && (
+                        <span className="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">✓ Đã cập nhật</span>
+                      )}
+                    </div>
+                    {field.multiline ? (
+                      <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className={inputCls + ' resize-y'} />
+                    ) : (
+                      <input type="text" value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} className={inputCls} />
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Ảnh quy trình */}
@@ -424,16 +457,24 @@ export default function AdminSettings() {
           <div className="space-y-8">
             <h3 className="text-sm font-bold text-gray-700 mb-4">Nội dung phần "Trầm Hương & Cuộc Sống Tươi Mới"</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {BLOG_FIELDS.map((field) => (
-                <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">{field.label}</label>
-                  {field.multiline ? (
-                    <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className={inputCls + ' resize-y'} />
-                  ) : (
-                    <input type="text" value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} className={inputCls} />
-                  )}
-                </div>
-              ))}
+              {BLOG_FIELDS.map((field) => {
+                const isUpdated = updatedKeys.has(field.key);
+                return (
+                  <div key={field.key} className={field.multiline ? 'md:col-span-2' : ''}>
+                    <div className="flex items-center gap-2 justify-between mb-2">
+                      <label className="text-sm font-semibold text-gray-700">{field.label}</label>
+                      {isUpdated && (
+                        <span className="text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded-full">✓ Đã cập nhật</span>
+                      )}
+                    </div>
+                    {field.multiline ? (
+                      <textarea value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} rows={3} className={inputCls + ' resize-y'} />
+                    ) : (
+                      <input type="text" value={formData[field.key] || ''} onChange={(e) => handleChange(field.key, e.target.value)} placeholder={field.placeholder} className={inputCls} />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
