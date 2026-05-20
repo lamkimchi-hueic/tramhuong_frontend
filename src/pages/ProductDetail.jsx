@@ -2,14 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { productAPI, resolveImageUrl } from '../services/api';
 import { useCart } from '../context/CartContext';
-import { FiHome, FiChevronRight, FiShoppingBag, FiHeart, FiMinus, FiPlus, FiCheckCircle, FiZoomIn, FiPackage } from 'react-icons/fi';
+import { FiHome, FiChevronRight, FiShoppingBag, FiMinus, FiPlus, FiCheckCircle, FiZoomIn, FiPackage } from 'react-icons/fi';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [liked, setLiked] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [zoomed, setZoomed] = useState(false);
@@ -292,17 +291,6 @@ export default function ProductDetail() {
                   ) : (
                     <><FiShoppingBag size={16} /> Thêm Vào Giỏ Hàng</>
                   )}
-                </button>
-                <button
-                  id="add-to-wishlist"
-                  onClick={() => setLiked(!liked)}
-                  className={`w-14 h-14 flex items-center justify-center rounded-md border-2 transition-all duration-300 ${
-                    liked
-                      ? 'bg-red-500 border-red-500 text-white'
-                      : 'border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white'
-                  }`}
-                >
-                  <FiHeart size={18} fill={liked ? 'white' : 'none'} />
                 </button>
               </div>
             </div>

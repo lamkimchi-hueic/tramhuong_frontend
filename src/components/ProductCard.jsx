@@ -8,12 +8,11 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiHeart, FiShoppingBag, FiCheck } from 'react-icons/fi';
+import { FiShoppingBag, FiCheck } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { resolveImageUrl, getOptimizedImageUrl } from '../services/api'; // Hàm chuyển đổi URL ảnh
 
 export default function ProductCard({ product }) {
-  const [liked, setLiked] = useState(false);     // Trạng thái yêu thích (trái tim đỏ)
   const [imgError, setImgError] = useState(false); // Trạng thái lỗi tải ảnh
   const [added, setAdded] = useState(false);       // Trạng thái đã thêm vào giỏ hàng
   const { addToCart } = useCart();
@@ -97,16 +96,6 @@ export default function ProductCard({ product }) {
       {/* ===== NÚT HÀNH ĐỘNG NHANH (hiện khi hover) ===== */}
       {/* Nằm góc trên phải, trượt ra từ phải sang trái khi hover */}
       <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style={hasVariants ? { top: '3.5rem' } : {}}>
-        {/* Nút yêu thích (trái tim) */}
-        <button
-          onClick={() => setLiked(!liked)}
-          className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md transition-colors duration-200 ${
-            liked ? 'bg-red-500 text-white' : 'bg-white text-gray-600 hover:bg-[var(--color-primary)] hover:text-white'
-          }`}
-          aria-label="Yêu thích"
-        >
-          <FiHeart size={15} fill={liked ? 'white' : 'none'} />
-        </button>
         {/* Nút thêm vào giỏ hàng */}
         <button
           onClick={handleAddToCart}
